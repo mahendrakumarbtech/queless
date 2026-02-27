@@ -44,7 +44,7 @@ export const AdminAuthWrapper = ({ children }) => {
                   <span className="app-brand-logo demo">
                     <img src={headerLogoUrl} alt={websiteName} aria-label={`${websiteName} logo`} />
                   </span>
-                  <span className="app-brand-text demo text-body fw-bold mt-2">{websiteName} Admin</span>
+                  <span className="app-brand-text demo text-body fw-bold mt-2">{websiteName}</span>
                 </Link>
               </div>
               {children}

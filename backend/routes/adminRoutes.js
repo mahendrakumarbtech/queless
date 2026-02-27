@@ -13,6 +13,7 @@ const {
 } = require('../controllers/adminController');
 const { uploadSettingsImage } = require('../middleware/upload');
 const {
+  getPermissionModules,
   getRoles,
   getRole,
   createRole,
@@ -22,7 +23,8 @@ const {
 const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
-router.use(authorize('admin'));
+// Admin panel: admin and staff (role name) can access
+router.use(authorize('admin', 'staff'));
 
 // User routes
 router.get('/users', getUsers);
@@ -41,6 +43,7 @@ router.post('/upload', uploadSettingsImage, uploadImage);
 router.get('/options', getOptions);
 
 // Role routes
+router.get('/roles/permission-modules', getPermissionModules);
 router.get('/roles', getRoles);
 router.get('/roles/:id', getRole);
 router.post('/roles', createRole);

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Card, Table, Form, InputGroup, Badge, Button } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
@@ -6,7 +7,10 @@ import config from '../../config/config';
 
 const API_URL = config.API_URL;
 
+const roleFilterLabels = { staff: 'Staff', provider: 'Provider', customer: 'Customer' };
+
 const Users = () => {
+  const { roleFilter } = useParams(); // staff | provider | customer from path /admin/users/:roleFilter
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: users, isLoading } = useQuery('adminUsers', async () => {
@@ -15,12 +19,16 @@ const Users = () => {
   });
 
   // Normalize users - ensure role is always a string
-  const normalizedUsers = users?.map(user => ({
+  let normalizedUsers = users?.map(user => ({
     ...user,
     role: typeof user.role === 'string'
       ? user.role
       : (user.role?.name || 'customer')
   })) || [];
+
+  if (roleFilter && roleFilterLabels[roleFilter]) {
+    normalizedUsers = normalizedUsers.filter((u) => u.role === roleFilter);
+  }
 
   const filteredUsers = normalizedUsers.filter(
     (user) =>
@@ -36,6 +44,10 @@ const Users = () => {
         return 'primary';
       case 'staff':
         return 'warning';
+      case 'provider_staff':
+        return 'info';
+      case 'customer':
+        return 'secondary';
       default:
         return 'secondary';
     }
@@ -44,7 +56,11 @@ const Users = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">Users Management</h4>
+        <h4 className="fw-bold mb-0">
+          {roleFilter && roleFilterLabels[roleFilter]
+            ? `Users – ${roleFilterLabels[roleFilter]}`
+            : 'Users Management'}
+        </h4>
         <InputGroup style={{ width: '300px' }}>
           <InputGroup.Text>
             <i className="bi bi-search"></i>

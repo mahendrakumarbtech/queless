@@ -14,19 +14,20 @@ const AdminLogin = () => {
   const { websiteName } = usePublicSettings();
   const navigate = useNavigate();
 
-  // If already logged in as admin, go to admin dashboard
+  // If already logged in as admin or staff (admin panel roles), go to admin dashboard
+  const isAdminPanelRole = (r) => r === 'admin' || r === 'staff';
   useEffect(() => {
     if (authLoading) return;
     if (isAuthenticated && user) {
       const role = typeof user.role === 'string' ? user.role : (user.role?.name || '');
-      if (role === 'admin') {
+      if (isAdminPanelRole(role)) {
         navigate('/admin', { replace: true });
       }
     }
   }, [isAuthenticated, user, authLoading, navigate]);
 
   const role = user ? (typeof user.role === 'string' ? user.role : (user.role?.name || '')) : '';
-  if (authLoading || (isAuthenticated && role === 'admin')) {
+  if (authLoading || (isAuthenticated && isAdminPanelRole(role))) {
     return (
       <AdminAuthWrapper>
         <p className="text-center text-muted">Redirecting...</p>
@@ -53,16 +54,13 @@ const AdminLogin = () => {
       if (userStr) {
         const user = JSON.parse(userStr);
         const role = typeof user.role === 'string' ? user.role : (user.role?.name || 'customer');
-        if (role === 'admin') {
+        if (isAdminPanelRole(role)) {
           navigate('/admin');
           return;
         }
         switch (role) {
           case 'provider':
             navigate('/provider');
-            break;
-          case 'staff':
-            navigate('/staff');
             break;
           default:
             navigate('/customer');

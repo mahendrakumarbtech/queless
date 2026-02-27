@@ -28,13 +28,11 @@ const Login = () => {
 
           switch (role) {
             case 'admin':
+            case 'staff':
               navigate('/admin');
               break;
             case 'provider':
               navigate('/provider');
-              break;
-            case 'staff':
-              navigate('/staff');
               break;
             default:
               navigate('/customer');

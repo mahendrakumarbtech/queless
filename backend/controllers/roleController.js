@@ -1,4 +1,19 @@
 const Role = require('../models/Role');
+const permissionModules = require('../config/permissionModules');
+
+// @desc    Get permission modules (for Role & Permission UI – Spatie-style grouped permissions)
+// @route   GET /api/admin/roles/permission-modules
+// @access  Private (Admin)
+exports.getPermissionModules = async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: permissionModules
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 
 // @desc    Get all roles
 // @route   GET /api/admin/roles
@@ -49,19 +64,23 @@ exports.getRole = async (req, res) => {
 // @access  Private (Admin)
 exports.createRole = async (req, res) => {
   try {
-    const { name, displayName, description, permissions } = req.body;
+    const { name, displayName, description, permissions, isActive } = req.body;
+    const roleName = (name || '').toLowerCase().trim();
+    if (!roleName) {
+      return res.status(400).json({ message: 'Role name is required' });
+    }
 
-    // Check if role already exists
-    const existingRole = await Role.findOne({ name: name.toLowerCase() });
+    const existingRole = await Role.findOne({ name: roleName });
     if (existingRole) {
       return res.status(400).json({ message: 'Role already exists' });
     }
 
     const role = await Role.create({
-      name: name.toLowerCase(),
-      displayName,
-      description,
-      permissions: permissions || [],
+      name: roleName,
+      displayName: displayName || roleName,
+      description: description || '',
+      permissions: Array.isArray(permissions) ? permissions : [],
+      isActive: isActive !== false,
       isSystem: false
     });
 
@@ -92,13 +111,19 @@ exports.updateRole = async (req, res) => {
       });
     }
 
+    const updateFields = {
+      displayName: req.body.displayName !== undefined ? req.body.displayName : role.displayName,
+      description: req.body.description !== undefined ? req.body.description : role.description,
+      isActive: req.body.isActive !== undefined ? req.body.isActive : role.isActive,
+      permissions: Array.isArray(req.body.permissions) ? req.body.permissions : role.permissions,
+      updatedAt: new Date()
+    };
+    if (req.body.name && !role.isSystem) {
+      updateFields.name = req.body.name.toLowerCase().trim();
+    }
     const updatedRole = await Role.findByIdAndUpdate(
       req.params.id,
-      {
-        ...req.body,
-        name: req.body.name ? req.body.name.toLowerCase() : role.name,
-        updatedAt: new Date()
-      },
+      updateFields,
       { new: true, runValidators: true }
     );
 

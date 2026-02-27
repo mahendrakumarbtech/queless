@@ -6,8 +6,7 @@ const roleSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true,
-    enum: ['admin', 'provider', 'staff', 'customer']
+    trim: true
   },
   displayName: {
     type: String,
@@ -31,6 +30,8 @@ const roleSchema = new mongoose.Schema({
       'queues.delete',
       'settings.read',
       'settings.write',
+      'roles.read',
+      'roles.write',
       'admin.access'
     ]
   }],

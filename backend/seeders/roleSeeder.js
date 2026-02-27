@@ -17,7 +17,20 @@ const defaultRoles = [
       'queues.delete',
       'settings.read',
       'settings.write',
+      'roles.read',
+      'roles.write',
       'admin.access'
+    ],
+    isSystem: true,
+    isActive: true
+  },
+  {
+    name: 'staff',
+    displayName: 'Staff Member',
+    description: 'Can manage queues for assigned provider',
+    permissions: [
+      'queues.read',
+      'queues.write'
     ],
     isSystem: true,
     isActive: true
@@ -37,9 +50,9 @@ const defaultRoles = [
     isActive: true
   },
   {
-    name: 'staff',
-    displayName: 'Staff Member',
-    description: 'Can manage queues for assigned provider',
+    name: 'provider_staff',
+    displayName: 'Provider Staff',
+    description: 'Staff under a provider, can manage queues for that provider',
     permissions: [
       'queues.read',
       'queues.write'

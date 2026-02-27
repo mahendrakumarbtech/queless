@@ -38,8 +38,8 @@
 
 /* Logo size: keep compact like reference theme (avoid oversized custom logo) */
 .auth-page-brand .app-brand-logo img {
-  max-height: 2.5rem;
-  max-width: 8.75rem;
+  max-height: 5rem;
+  max-width: 100%;
   width: auto;
   height: auto;
   object-fit: contain;

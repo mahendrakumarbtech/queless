@@ -21,6 +21,8 @@ import AdminUsers from './pages/admin/Users';
 import AdminProviders from './pages/admin/Providers';
 import AdminQueues from './pages/admin/Queues';
 import AdminSettings from './pages/admin/Settings';
+import Roles from './pages/admin/Roles';
+import RoleForm from './pages/admin/RoleForm';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminForgotPassword from './pages/admin/AdminForgotPassword';
 import ProviderList from './pages/ProviderList';
@@ -171,11 +173,15 @@ function App() {
               <Route
                 path="/admin/*"
                 element={
-                  <PrivateRoute allowedRoles={['admin']} redirectToAdminLogin>
+                  <PrivateRoute allowedRoles={['admin', 'staff']} redirectToAdminLogin>
                     <SneatLayout>
                       <Routes>
                         <Route index element={<AdminDashboard />} />
+                        <Route path="roles" element={<Roles />} />
+                        <Route path="roles/create" element={<RoleForm />} />
+                        <Route path="roles/:id/edit" element={<RoleForm />} />
                         <Route path="users" element={<AdminUsers />} />
+                        <Route path="users/:roleFilter" element={<AdminUsers />} />
                         <Route path="providers" element={<AdminProviders />} />
                         <Route path="queues" element={<AdminQueues />} />
                         <Route path="settings" element={<AdminSettings />} />

@@ -34,11 +34,10 @@ const Navbar = () => {
     
     switch (userRole) {
       case 'admin':
+      case 'staff':
         return '/admin';
       case 'provider':
         return '/provider';
-      case 'staff':
-        return '/staff';
       case 'customer':
         return '/customer';
       default:

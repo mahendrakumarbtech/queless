@@ -15,6 +15,7 @@
   background: #f5f5f9;
   z-index: 9998;
 }
+
 .admin-theme-loader-spinner {
   width: 2.5rem;
   height: 2.5rem;
@@ -23,16 +24,40 @@
   border-radius: 50%;
   animation: admin-theme-spin 0.8s linear infinite;
 }
+
 .admin-theme-loader-text {
   margin-top: 1rem;
   color: #697a8d;
   font-size: 0.875rem;
 }
+
 @keyframes admin-theme-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Sidebar logo size – avoid oversized custom logo */
+.menu .app-brand.demo {
+  margin: 0;
+  padding: 5px 30px;
+  display: block;
+}
+.menu .app-brand.demo .app-brand-link{
+  display: block;
+}
+.menu .app-brand.demo .app-brand-link .app-brand-logo{
+  display: block;
+}
+.menu .app-brand.demo .app-brand-link .app-brand-logo img {
+  max-height: 100%;
+  max-width: 100%;
+}
+.menu .app-brand.demo .app-brand-link .app-brand-text{
+  display: block;
+}
+
+
 .layout-menu .app-brand-logo img {
   max-height: 2rem;
   max-width: 6rem;
@@ -45,6 +70,7 @@
 .w-px-20 {
   width: 1.25rem;
 }
+
 .h-px-20 {
   height: 1.25rem;
 }
@@ -55,9 +81,11 @@
   max-width: 205px;
   margin: 10px auto 10px 0;
 }
+
 .image-upload-area .image-edit input.d-none {
   display: none !important;
 }
+
 .image-upload-area .image-preview {
   width: auto;
   height: 192px;
@@ -65,6 +93,7 @@
   border: 6px solid #f8f8f8;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .image-upload-area .image-preview .imagePreview {
   width: 100%;
   height: 100%;
@@ -72,6 +101,7 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
 .image-upload-area .image-edit .imageUploadBtn,
 .image-upload-area .image-edit .removeImageBtn {
   display: block;
@@ -86,19 +116,23 @@
   text-align: center;
   font-size: 0.875rem;
 }
+
 .image-upload-area .image-edit .imageUploadBtn {
   background: #fff;
   color: #333;
 }
+
 .image-upload-area .image-edit .imageUploadBtn:hover {
   background: #f1f1f1;
   border-color: #d6d6d6;
 }
+
 .image-upload-area .image-edit .removeImageBtn {
   background-color: #ff3e1d;
   color: #fff;
   border-color: transparent;
 }
+
 .image-upload-area .image-edit .removeImageBtn:hover {
   opacity: 0.9;
 }
@@ -119,9 +153,11 @@
   padding: 12px;
   overflow: auto;
 }
+
 .cropper-model .cropper-popup {
   width: 100%;
 }
+
 .cropper-model .cropper-inner {
   width: 100%;
   height: 400px;
@@ -129,11 +165,13 @@
   position: relative;
   overflow: hidden;
 }
+
 .cropper-model .cropper-inner img {
   max-width: 100%;
   max-height: 100%;
   display: block;
 }
+
 .cropper-model .close-button,
 .cropper-model .crop-button {
   cursor: pointer;
@@ -143,14 +181,17 @@
 .react-select-container {
   width: 100%;
 }
+
 .react-select__control {
   min-height: 38px;
   border-color: #d9dee3;
 }
+
 .react-select__control--is-focused {
   border-color: #696cff;
   box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.25);
 }
+
 .react-select__menu {
   z-index: 1060;
 }

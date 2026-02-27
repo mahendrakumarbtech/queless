@@ -9,7 +9,21 @@ import './SneatLayout.css';
 
 const menuItems = [
   { text: 'Dashboard', icon: 'bx bx-home', path: '/admin' },
-  { text: 'Users', icon: 'bx bx-user', path: '/admin/users' },
+  {
+    text: 'Role & Permission',
+    icon: 'bx bx-lock-alt',
+    path: '/admin/roles',
+  },
+  {
+    text: 'Users',
+    icon: 'bx bx-user',
+    path: '/admin/users',
+    children: [
+      { text: 'Staff', path: '/admin/users/staff' },
+      { text: 'Provider', path: '/admin/users/provider' },
+      { text: 'Customer', path: '/admin/users/customer' },
+    ],
+  },
   { text: 'Providers', icon: 'bx bx-building', path: '/admin/providers' },
   { text: 'Queues', icon: 'bx bx-list-ul', path: '/admin/queues' },
   { text: 'Settings', icon: 'bx bx-cog', path: '/admin/settings' },
@@ -81,16 +95,45 @@ const SneatLayout = ({ children }) => {
 
           <ul className="menu-inner py-1">
             {menuItems.map((item) => (
-              <li key={item.path} className="menu-item">
-                <NavLink
-                  to={item.path}
-                  className="menu-link"
-                  onClick={closeSidebar}
-                  aria-label={item.text}
-                >
-                  <i className={`menu-icon tf-icons ${item.icon}`}></i>
-                  <div data-i18n={item.text}>{item.text}</div>
-                </NavLink>
+              <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub menu-sub-open' : ''}`}>
+                {item.children ? (
+                  <>
+                    <a
+                      href="#"
+                      className="menu-link menu-toggle"
+                      onClick={(e) => { e.preventDefault(); }}
+                      aria-expanded="true"
+                    >
+                      <i className={`menu-icon tf-icons ${item.icon}`}></i>
+                      <div data-i18n={item.text}>{item.text}</div>
+                      <i className="menu-arrow tf-icons bx bx-chevron-down"></i>
+                    </a>
+                    <ul className="menu-sub">
+                      <li className="menu-item">
+                        <NavLink to={item.path} className="menu-link" onClick={closeSidebar}>
+                          <div data-i18n="All">All</div>
+                        </NavLink>
+                      </li>
+                      {item.children.map((sub) => (
+                        <li key={sub.path} className="menu-item">
+                          <NavLink to={sub.path} className="menu-link" onClick={closeSidebar}>
+                            <div data-i18n={sub.text}>{sub.text}</div>
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className="menu-link"
+                    onClick={closeSidebar}
+                    aria-label={item.text}
+                  >
+                    <i className={`menu-icon tf-icons ${item.icon}`}></i>
+                    <div data-i18n={item.text}>{item.text}</div>
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
