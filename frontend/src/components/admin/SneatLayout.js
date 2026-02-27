@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { usePublicSettings } from '../../context/PublicSettingsContext';
 import getGreetingMessage from '../../utils/greetingHandler';
-import { loadAdminTheme, unloadAdminTheme } from './admin-theme-loader';
+import { loadAdminThemeAsync, unloadAdminTheme } from './admin-theme-loader';
 import './SneatLayout.css';
 
 const menuItems = [
@@ -14,14 +15,29 @@ const menuItems = [
   { text: 'Settings', icon: 'bx bx-cog', path: '/admin/settings' },
 ];
 
+const AdminLayoutLoader = () => (
+  <div className="admin-theme-loader-wrap">
+    <div className="admin-theme-loader-spinner" aria-hidden="true" />
+    <p className="admin-theme-loader-text">Loading...</p>
+  </div>
+);
+
 const SneatLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [themeReady, setThemeReady] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { websiteName, sidebarLogoUrl } = usePublicSettings();
 
   useEffect(() => {
-    loadAdminTheme();
-    return () => unloadAdminTheme();
+    let cancelled = false;
+    loadAdminThemeAsync().then(() => {
+      if (!cancelled) setThemeReady(true);
+    });
+    return () => {
+      cancelled = true;
+      unloadAdminTheme();
+    };
   }, []);
 
   const handleLogout = (e) => {
@@ -32,17 +48,24 @@ const SneatLayout = ({ children }) => {
 
   const closeSidebar = () => setSidebarOpen(false);
 
+  if (!themeReady) {
+    return <AdminLayoutLoader />;
+  }
+
   return (
     <div className="layout-wrapper layout-content-navbar">
       <div className={`layout-container ${sidebarOpen ? 'layout-menu-expanded' : ''}`}>
         {/* Sidebar - theme HTML structure */}
         <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme">
           <div className="app-brand demo">
-            <Link to="/admin" className="app-brand-link" aria-label="QueLess home">
-              <span className="app-brand-logo demo">
-                <img src="/assets/img/sneat.svg" alt="QueLess" aria-label="QueLess logo" />
-              </span>
-              <span className="app-brand-text demo menu-text fw-bold ms-2">QueLess</span>
+            <Link to="/admin" className="app-brand-link" aria-label={`${websiteName} home`}>
+              {sidebarLogoUrl ? (
+                <span className="app-brand-logo demo">
+                  <img src={sidebarLogoUrl} alt={websiteName} aria-label={`${websiteName} logo`} />
+                </span>
+              ) : (
+                <span className="app-brand-text demo menu-text fw-bold">{websiteName}</span>
+              )}
             </Link>
             <a
               href="#"
@@ -168,7 +191,7 @@ const SneatLayout = ({ children }) => {
               <div className="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
                 <div className="mb-2 mb-md-0">
                   © {new Date().getFullYear()}, made with <span className="text-danger">❤️</span> by{' '}
-                  <a href="#" className="footer-link fw-medium">QueLess</a>
+                  <a href="#" className="footer-link fw-medium">{websiteName}</a>
                 </div>
               </div>
             </footer>

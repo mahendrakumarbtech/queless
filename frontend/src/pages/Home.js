@@ -2,9 +2,11 @@ import React from 'react';
 import { Container, Typography, Box, Grid, Card, CardContent, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePublicSettings } from '../context/PublicSettingsContext';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
+  const { websiteName, websiteTagline } = usePublicSettings();
 
   const providerTypes = [
     { type: 'doctor', label: 'Doctor' },
@@ -20,10 +22,10 @@ const Home = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h2" component="h1" gutterBottom>
-          QueLess
+          {websiteName}
         </Typography>
         <Typography variant="h5" color="text.secondary" gutterBottom>
-          Smart Queue Management System
+          {websiteTagline}
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
           Book your slot, track your number, and manage queues efficiently

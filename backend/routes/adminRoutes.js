@@ -8,7 +8,8 @@ const {
   getSettings,
   updateSettings,
   getDashboard,
-  uploadImage
+  uploadImage,
+  getOptions,
 } = require('../controllers/adminController');
 const { uploadSettingsImage } = require('../middleware/upload');
 const {
@@ -37,6 +38,7 @@ router.get('/queues', getQueues);
 router.get('/settings', getSettings);
 router.put('/settings', updateSettings);
 router.post('/upload', uploadSettingsImage, uploadImage);
+router.get('/options', getOptions);
 
 // Role routes
 router.get('/roles', getRoles);

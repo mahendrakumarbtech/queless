@@ -1,7 +1,7 @@
 /**
- * Loads Sneat theme assets (CSS/fonts) when admin layout mounts.
- * Theme files are copied from /Applications/node/theme (public/assets).
- * Remove all on unmount so main app is unaffected.
+ * Loads Sneat theme assets when admin layout mounts; removes on unmount.
+ * Theme CSS is injected only on admin so it doesn't break the main app layout.
+ * We wait for CSS to load before showing layout (avoids FOUC).
  */
 const THEME_LINK_ID = 'sneat-admin-theme';
 
@@ -16,22 +16,46 @@ const themeStyles = [
 
 const htmlClasses = ['light-style', 'layout-menu-fixed', 'layout-content-navbar', 'layout-compact'];
 
-export function loadAdminTheme() {
-  const fragment = document.createDocumentFragment();
-  themeStyles.forEach(({ href, id }) => {
+function loadStyle(href, id) {
+  return new Promise((resolve) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
     link.id = id;
     link.setAttribute('data-sneat-admin', THEME_LINK_ID);
-    fragment.appendChild(link);
+    link.onload = () => resolve();
+    link.onerror = () => resolve();
+    document.head.appendChild(link);
   });
-  document.head.appendChild(fragment);
+}
 
+export function loadAdminTheme() {
   const html = document.documentElement;
   htmlClasses.forEach((c) => html.classList.add(c));
   html.setAttribute('dir', 'ltr');
   html.setAttribute('data-theme', 'theme-default');
+  themeStyles.forEach(({ href, id }) => {
+    if (document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.id = id;
+    link.setAttribute('data-sneat-admin', THEME_LINK_ID);
+    document.head.appendChild(link);
+  });
+}
+
+/** Returns Promise that resolves when theme CSS has loaded. Use this so layout doesn't show until ready. */
+export function loadAdminThemeAsync() {
+  const html = document.documentElement;
+  htmlClasses.forEach((c) => html.classList.add(c));
+  html.setAttribute('dir', 'ltr');
+  html.setAttribute('data-theme', 'theme-default');
+
+  const toLoad = themeStyles.filter(({ id }) => !document.getElementById(id));
+  if (toLoad.length === 0) return Promise.resolve();
+
+  return Promise.all(toLoad.map(({ href, id }) => loadStyle(href, id)));
 }
 
 export function unloadAdminTheme() {

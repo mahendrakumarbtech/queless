@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../../config/config';
+import { usePublicSettings } from '../../context/PublicSettingsContext';
 import ImageUploadWithCropper from '../../components/admin/ImageUploadWithCropper';
+import AdminOptionsSelect from '../../components/admin/AdminOptionsSelect';
+import ConfigSelect from '../../components/admin/ConfigSelect';
 
 const API_URL = config.API_URL;
 
@@ -26,13 +29,18 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('general_setting');
+  const { refetchPublicSettings } = usePublicSettings();
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const { data } = await axios.get(`${API_URL}/admin/settings`);
         const d = data.data || {};
-        setSettings(d);
+        // Normalize logo keys: show website_logo/website_white_logo, fallback to old keys
+        const normalized = { ...d };
+        if (d.backend_logo != null && normalized.website_logo == null) normalized.website_logo = d.backend_logo;
+        if (d.backend_white_logo != null && normalized.website_white_logo == null) normalized.website_white_logo = d.backend_white_logo;
+        setSettings(normalized);
         if (d.sms_gateway) {
           try {
             const parsed = typeof d.sms_gateway === 'string' ? JSON.parse(d.sms_gateway) : d.sms_gateway;
@@ -60,6 +68,7 @@ const Settings = () => {
     setSaving(true);
     try {
       await axios.put(`${API_URL}/admin/settings`, payload);
+      await refetchPublicSettings();
       alert('Settings saved successfully');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to save');
@@ -83,8 +92,8 @@ const Settings = () => {
       android_app_link_merchant: settings.android_app_link_merchant,
       ios_app_link_merchant: settings.ios_app_link_merchant,
       favicon_icon: settings.favicon_icon,
-      backend_logo: settings.backend_logo,
-      backend_white_logo: settings.backend_white_logo,
+      website_logo: settings.website_logo,
+      website_white_logo: settings.website_white_logo,
     });
   };
 
@@ -279,20 +288,20 @@ const Settings = () => {
                         <div className="text-muted small mt-1">Square image (e.g. 1:1). Accepted: JPEG, PNG, GIF, WebP</div>
                       </div>
                       <div className="mb-3 col-md-4">
-                        <label className="form-label" htmlFor="backend_logo">Backend Logo</label>
+                        <label className="form-label" htmlFor="website_logo">Website Logo</label>
                         <ImageUploadWithCropper
-                          name="backend_logo"
-                          value={settings.backend_logo ?? ''}
-                          onChange={(url) => update('backend_logo', url)}
+                          name="website_logo"
+                          value={settings.website_logo ?? ''}
+                          onChange={(url) => update('website_logo', url)}
                         />
-                        <div className="text-muted small mt-1">Accepted: JPEG, PNG, GIF, WebP</div>
+                        <div className="text-muted small mt-1">Used on login, navbar, light areas. Accepted: JPEG, PNG, GIF, WebP</div>
                       </div>
                       <div className="mb-3 col-md-4">
-                        <label className="form-label" htmlFor="backend_white_logo">Backend White Logo</label>
+                        <label className="form-label" htmlFor="website_white_logo">Website White Logo</label>
                         <ImageUploadWithCropper
-                          name="backend_white_logo"
-                          value={settings.backend_white_logo ?? ''}
-                          onChange={(url) => update('backend_white_logo', url)}
+                          name="website_white_logo"
+                          value={settings.website_white_logo ?? ''}
+                          onChange={(url) => update('website_white_logo', url)}
                           className="bg-primary"
                         />
                         <div className="text-muted small mt-1">For dark sidebar. Accepted: JPEG, PNG, GIF, WebP</div>
@@ -314,37 +323,61 @@ const Settings = () => {
                   <form onSubmit={handleDefaultSubmit}>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="default_currency">Default Currency</label>
-                      <input type="text" className="form-control" id="default_currency" placeholder="e.g. USD, INR"
-                        value={settings.default_currency ?? ''} onChange={(e) => update('default_currency', e.target.value)} />
+                      <AdminOptionsSelect
+                        type="currency"
+                        value={settings.default_currency ?? ''}
+                        onChange={(v) => update('default_currency', v)}
+                        placeholder="Select currency"
+                      />
                     </div>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="default_currency_position">Default Currency Position</label>
-                      <select className="form-select" id="default_currency_position"
-                        value={settings.default_currency_position ?? ''} onChange={(e) => update('default_currency_position', e.target.value)}>
-                        <option value="">Select</option>
-                        <option value="before">Before (e.g. $100)</option>
-                        <option value="after">After (e.g. 100 USD)</option>
-                      </select>
+                      <ConfigSelect
+                        optionsKey="currency_position"
+                        id="default_currency_position"
+                        value={settings.default_currency_position ?? ''}
+                        onChange={(v) => update('default_currency_position', v)}
+                        placeholder="Select position"
+                      />
                     </div>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="default_timezone">Default Timezone</label>
-                      <input type="text" className="form-control" id="default_timezone" placeholder="e.g. Asia/Kolkata"
-                        value={settings.default_timezone ?? ''} onChange={(e) => update('default_timezone', e.target.value)} />
+                      <AdminOptionsSelect
+                        type="timezone"
+                        value={settings.default_timezone ?? ''}
+                        onChange={(v) => update('default_timezone', v)}
+                        placeholder="Select timezone"
+                      />
                     </div>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="date_format">Date Format</label>
-                      <input type="text" className="form-control" id="date_format" placeholder="e.g. d/m/Y"
-                        value={settings.date_format ?? ''} onChange={(e) => update('date_format', e.target.value)} />
+                      <ConfigSelect
+                        optionsKey="date_format"
+                        id="date_format"
+                        value={settings.date_format ?? ''}
+                        onChange={(v) => update('date_format', v)}
+                        placeholder="Select date format"
+                      />
                     </div>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="time_format">Time Format</label>
-                      <input type="text" className="form-control" id="time_format" placeholder="e.g. H:i"
-                        value={settings.time_format ?? ''} onChange={(e) => update('time_format', e.target.value)} />
+                      <ConfigSelect
+                        optionsKey="time_format"
+                        id="time_format"
+                        value={settings.time_format ?? ''}
+                        onChange={(v) => update('time_format', v)}
+                        placeholder="Select time format"
+                      />
                     </div>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="datetime_format">Datetime Format</label>
-                      <input type="text" className="form-control" id="datetime_format" placeholder="e.g. d/m/Y H:i"
-                        value={settings.datetime_format ?? ''} onChange={(e) => update('datetime_format', e.target.value)} />
+                      <ConfigSelect
+                        optionsKey="datetime_format"
+                        id="datetime_format"
+                        value={settings.datetime_format ?? ''}
+                        onChange={(v) => update('datetime_format', v)}
+                        placeholder="Select datetime format"
+                      />
                     </div>
                     {btnSave(saving)}
                   </form>

@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
+import { usePublicSettings } from '../context/PublicSettingsContext';
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
+  const { websiteName } = usePublicSettings();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -48,7 +50,7 @@ const Navbar = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
-          QueLess
+          {websiteName}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <Button color="inherit" component={Link} to="/providers">

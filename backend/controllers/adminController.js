@@ -125,6 +125,28 @@ exports.getQueues = async (req, res) => {
   }
 };
 
+// @desc    Get public settings (no auth) – website name, logos, favicon
+// @route   GET /api/settings/public
+// @access  Public
+exports.getPublicSettings = async (req, res) => {
+  try {
+    const settings = await Settings.find().sort({ key: 1 });
+    const all = {};
+    settings.forEach(s => { all[s.key] = s.value; });
+    const data = {
+      website_name: all.website_name,
+      website_tagline: all.website_tagline,
+      favicon_icon: all.favicon_icon,
+      website_logo: all.website_logo != null ? all.website_logo : all.backend_logo,
+      website_white_logo: all.website_white_logo != null ? all.website_white_logo : all.backend_white_logo,
+    };
+    Object.keys(data).forEach(k => { if (data[k] == null) delete data[k]; });
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // @desc    Get settings
 // @route   GET /api/admin/settings
 // @access  Private (Admin)
@@ -209,4 +231,22 @@ exports.uploadImage = (req, res) => {
   }
   const url = `/uploads/settings/${req.file.filename}`;
   res.json({ success: true, data: { url } });
+};
+
+// @desc    Get options for dropdowns (currency, timezone, etc.) – single common API
+// @route   GET /api/admin/options?type=currency|timezone&q=search
+// @access  Private (Admin)
+const optionsConfig = require('../config/optionsConfig');
+
+exports.getOptions = (req, res) => {
+  try {
+    const { type, q } = req.query;
+    if (!type) {
+      return res.status(400).json({ success: false, message: 'Missing type' });
+    }
+    const results = optionsConfig.getOptions(type, q || '');
+    res.json({ success: true, data: results });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };

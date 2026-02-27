@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Card, CardContent, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material';
+import { Container, Typography, Box, Card, CardContent, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -13,7 +13,7 @@ const CustomerDashboard = () => {
   const { user } = useAuth();
   const [currentNumbers, setCurrentNumbers] = useState({});
 
-  const { data: myQueues, refetch } = useQuery(
+  const { data: myQueues } = useQuery(
     'myQueues',
     async () => {
       const response = await axios.get(`${API_URL}/customer/my-queues`);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { usePublicSettings } from '../../context/PublicSettingsContext';
 import { AdminAuthWrapper } from './auth/AdminAuthWrapper';
 
 const AdminLogin = () => {
@@ -10,6 +11,7 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, user, isAuthenticated, loading: authLoading } = useAuth();
+  const { websiteName } = usePublicSettings();
   const navigate = useNavigate();
 
   // If already logged in as admin, go to admin dashboard
@@ -33,7 +35,7 @@ const AdminLogin = () => {
   }
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     if (name === 'email') setEmail(value);
     if (name === 'password') setPassword(value);
     if (name === 'rememberMe') setRememberMe(checked);
@@ -75,7 +77,7 @@ const AdminLogin = () => {
 
   return (
     <AdminAuthWrapper>
-      <h4 className="mb-2">Welcome to QueLess Admin! 👋</h4>
+      <h4 className="mb-2">Welcome to {websiteName} Admin! 👋</h4>
       <p className="mb-4">Please sign-in to your account and start the adventure</p>
 
       {error && (

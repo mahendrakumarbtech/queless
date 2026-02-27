@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { AuthProvider } from './context/AuthContext';
+import { PublicSettingsProvider, usePublicSettings } from './context/PublicSettingsContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import AdminLayout from './components/AdminLayout';
@@ -79,6 +80,25 @@ const adminTheme = createTheme({
   },
 });
 
+// Document title and favicon from public settings
+const DocumentHead = () => {
+  const { websiteName, faviconIcon } = usePublicSettings();
+  React.useEffect(() => {
+    document.title = websiteName ? `${websiteName}` : document.title;
+  }, [websiteName]);
+  React.useEffect(() => {
+    if (!faviconIcon) return;
+    let link = document.querySelector('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = faviconIcon;
+  }, [faviconIcon]);
+  return null;
+};
+
 // Component to conditionally show Navbar
 const ConditionalNavbar = () => {
   const location = useLocation();
@@ -104,9 +124,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <ThemeWrapper>
-            <ConditionalNavbar />
+        <PublicSettingsProvider>
+          <Router>
+            <ThemeWrapper>
+              <DocumentHead />
+              <ConditionalNavbar />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -167,6 +189,7 @@ function App() {
             </Routes>
           </ThemeWrapper>
         </Router>
+        </PublicSettingsProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
