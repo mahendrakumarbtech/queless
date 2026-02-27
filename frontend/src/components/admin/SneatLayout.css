@@ -1,0 +1,103 @@
+/**
+ * Admin custom CSS (QueLess)
+ * Theme HTML + CSS are from public/assets (core.css, theme-default.css).
+ * Add here only custom overrides when you need to change something.
+ */
+
+/* Theme uses these utility classes in navbar dropdown badge */
+.w-px-20 {
+  width: 1.25rem;
+}
+.h-px-20 {
+  height: 1.25rem;
+}
+
+/* Image upload (settings) - same behaviour as reference */
+.image-upload-area {
+  position: relative;
+  max-width: 205px;
+  margin: 10px auto 10px 0;
+}
+.image-upload-area .image-edit input.d-none {
+  display: none !important;
+}
+.image-upload-area .image-preview {
+  width: auto;
+  height: 192px;
+  position: relative;
+  border: 6px solid #f8f8f8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.image-upload-area .image-preview .imagePreview {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.image-upload-area .image-edit .imageUploadBtn,
+.image-upload-area .image-edit .removeImageBtn {
+  display: block;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 0.875rem;
+}
+.image-upload-area .image-edit .imageUploadBtn {
+  background: #fff;
+  color: #333;
+}
+.image-upload-area .image-edit .imageUploadBtn:hover {
+  background: #f1f1f1;
+  border-color: #d6d6d6;
+}
+.image-upload-area .image-edit .removeImageBtn {
+  background-color: #ff3e1d;
+  color: #fff;
+  border-color: transparent;
+}
+.image-upload-area .image-edit .removeImageBtn:hover {
+  opacity: 0.9;
+}
+
+/* Cropper modal */
+.cropper-model {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  background: #fff;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+}
+.cropper-model .cropper-popup {
+  width: 100%;
+}
+.cropper-model .cropper-inner {
+  width: 100%;
+  height: 400px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+.cropper-model .cropper-inner img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+.cropper-model .close-button,
+.cropper-model .crop-button {
+  cursor: pointer;
+}
