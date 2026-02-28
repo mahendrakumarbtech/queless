@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
@@ -43,12 +43,20 @@ const AdminLayoutLoader = () => {
 
 const SneatLayout = ({ children }) => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const pathname = location.pathname;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [expandedMenuPath, setExpandedMenuPath] = useState(null);
   const [themeReady, setThemeReady] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { websiteName, sidebarLogoUrl } = usePublicSettings();
   const menuItems = getMenuItems(t);
+
+  const isMenuOpen = (item) => {
+    if (!item.children) return false;
+    return expandedMenuPath === item.path || (expandedMenuPath === null && pathname.startsWith(item.path));
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -102,14 +110,14 @@ const SneatLayout = ({ children }) => {
 
           <ul className="menu-inner py-1">
             {menuItems.map((item) => (
-              <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub menu-sub-open' : ''}`}>
+              <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub' : ''} ${isMenuOpen(item) ? 'open' : ''}`}>
                 {item.children ? (
                   <>
                     <button
                       type="button"
                       className="menu-link menu-toggle"
-                      onClick={() => {}}
-                      aria-expanded="true"
+                      onClick={() => setExpandedMenuPath((prev) => (prev === item.path ? null : item.path))}
+                      aria-expanded={isMenuOpen(item)}
                     >
                       <i className={`menu-icon tf-icons ${item.icon}`}></i>
                       <div>{item.text}</div>
