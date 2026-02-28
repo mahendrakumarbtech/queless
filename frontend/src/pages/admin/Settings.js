@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
 import { usePublicSettings } from '../../context/PublicSettingsContext';
 import ImageUploadWithCropper from '../../components/admin/ImageUploadWithCropper';
@@ -9,20 +10,21 @@ import ConfigSelect from '../../components/admin/ConfigSelect';
 const API_URL = config.API_URL;
 
 const TABS = [
-  { id: 'general_setting', label: 'General Setting' },
-  { id: 'default_setting', label: 'Default Setting' },
-  { id: 'default_pages_setting', label: 'Default Pages Setting' },
-  { id: 'email_setting', label: 'Email Setting' },
-  { id: 'sms_gateway_setting', label: 'SMS Gateway Setting' },
-  { id: 'whatsapp_gateway_setting', label: 'WhatsApp Gateway Setting' },
-  { id: 'social_link_setting', label: 'Social Link Setting' },
-  { id: 'queue_setting', label: 'Queue Setting' },
+  { id: 'general_setting', labelKey: 'adminSettings:tabs.general' },
+  { id: 'default_setting', labelKey: 'adminSettings:tabs.default' },
+  { id: 'default_pages_setting', labelKey: 'adminSettings:tabs.defaultPages' },
+  { id: 'email_setting', labelKey: 'adminSettings:tabs.email' },
+  { id: 'sms_gateway_setting', labelKey: 'adminSettings:tabs.smsGateway' },
+  { id: 'whatsapp_gateway_setting', labelKey: 'adminSettings:tabs.whatsappGateway' },
+  { id: 'social_link_setting', labelKey: 'adminSettings:tabs.socialLinks' },
+  { id: 'queue_setting', labelKey: 'adminSettings:tabs.queue' },
 ];
 
 const emptySmsGateway = () => ({ msg91: { active: '', authkey: '' } });
 const emptyWhatsappGateway = () => ({ gallabox: { active: '', api_key: '', api_secret: '', channel_id: '' } });
 
 const Settings = () => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({});
   const [smsGateway, setSmsGateway] = useState(emptySmsGateway());
   const [whatsappGateway, setWhatsappGateway] = useState(emptyWhatsappGateway());
@@ -69,9 +71,9 @@ const Settings = () => {
     try {
       await axios.put(`${API_URL}/admin/settings`, payload);
       await refetchPublicSettings();
-      alert('Settings saved successfully');
+      alert(t('adminSettings:messages.saved'));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to save');
+      alert(err.response?.data?.message || t('adminSettings:messages.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -170,7 +172,7 @@ const Settings = () => {
     return (
       <div className="text-center py-5">
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common:loading')}</span>
         </div>
       </div>
     );
@@ -179,19 +181,19 @@ const Settings = () => {
   const btnSave = (saving) => (
     <button type="submit" className="btn btn-primary" disabled={saving}>
       <i className="bx bx-save me-2"></i>
-      {saving ? 'Saving...' : 'Save Changes'}
+      {saving ? t('adminSettings:buttons.saving') : t('adminSettings:buttons.saveChanges')}
     </button>
   );
 
   return (
     <div className="container-fluid p-0">
-      <h1 className="h3 mb-3">Settings</h1>
+      <h1 className="h3 mb-3">{t('adminSettings:title')}</h1>
 
       <div className="row">
         <div className="col-md-3 col-xl-2 mb-2">
           <div className="card">
             <div className="card-header header-elements">
-              <div className="card-action-title mb-0">Settings</div>
+              <div className="card-action-title mb-0">{t('adminSettings:title')}</div>
             </div>
             <div className="list-group list-group-flush" id="setting-menu-tab" role="tablist">
               {TABS.map((tab) => (
@@ -202,7 +204,7 @@ const Settings = () => {
                   role="tab"
                   onClick={(e) => { e.preventDefault(); setActiveTab(tab.id); }}
                 >
-                  {tab.label}
+                  {t(tab.labelKey)}
                 </a>
               ))}
             </div>
@@ -215,96 +217,96 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'general_setting' ? 'show active' : ''}`} id="general_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">General Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:general.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleGeneralSubmit}>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="website_name">Website Name</label>
-                      <input type="text" className="form-control" id="website_name" placeholder="Website Name"
+                      <label className="form-label" htmlFor="website_name">{t('adminSettings:general.websiteName.label')}</label>
+                      <input type="text" className="form-control" id="website_name" placeholder={t('adminSettings:general.websiteName.placeholder')}
                         value={settings.website_name ?? ''} onChange={(e) => update('website_name', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="website_tagline">Website Tagline</label>
-                      <input type="text" className="form-control" id="website_tagline" placeholder="Website Tagline"
+                      <label className="form-label" htmlFor="website_tagline">{t('adminSettings:general.websiteTagline.label')}</label>
+                      <input type="text" className="form-control" id="website_tagline" placeholder={t('adminSettings:general.websiteTagline.placeholder')}
                         value={settings.website_tagline ?? ''} onChange={(e) => update('website_tagline', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="contact_person">Contact Person</label>
-                      <input type="text" className="form-control" id="contact_person" placeholder="Contact Person"
+                      <label className="form-label" htmlFor="contact_person">{t('adminSettings:general.contactPerson.label')}</label>
+                      <input type="text" className="form-control" id="contact_person" placeholder={t('adminSettings:general.contactPerson.placeholder')}
                         value={settings.contact_person ?? ''} onChange={(e) => update('contact_person', e.target.value)} />
                     </div>
                     <div className="row">
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="website_email">Website Email</label>
-                        <input type="text" className="form-control" id="website_email" placeholder="Website Email"
+                        <label className="form-label" htmlFor="website_email">{t('adminSettings:general.websiteEmail.label')}</label>
+                        <input type="text" className="form-control" id="website_email" placeholder={t('adminSettings:general.websiteEmail.placeholder')}
                           value={settings.website_email ?? ''} onChange={(e) => update('website_email', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="website_telephone_no">Website Telephone No</label>
-                        <input type="text" className="form-control" id="website_telephone_no" placeholder="Website Telephone No"
+                        <label className="form-label" htmlFor="website_telephone_no">{t('adminSettings:general.websiteTelephoneNo.label')}</label>
+                        <input type="text" className="form-control" id="website_telephone_no" placeholder={t('adminSettings:general.websiteTelephoneNo.placeholder')}
                           value={settings.website_telephone_no ?? ''} onChange={(e) => update('website_telephone_no', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="website_mobile_no">Website Mobile No</label>
-                        <input type="text" className="form-control" id="website_mobile_no" placeholder="Website Mobile No"
+                        <label className="form-label" htmlFor="website_mobile_no">{t('adminSettings:general.websiteMobileNo.label')}</label>
+                        <input type="text" className="form-control" id="website_mobile_no" placeholder={t('adminSettings:general.websiteMobileNo.placeholder')}
                           value={settings.website_mobile_no ?? ''} onChange={(e) => update('website_mobile_no', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="website_whatsapp_no">Website WhatsApp No</label>
-                        <input type="text" className="form-control" id="website_whatsapp_no" placeholder="Website WhatsApp No"
+                        <label className="form-label" htmlFor="website_whatsapp_no">{t('adminSettings:general.websiteWhatsappNo.label')}</label>
+                        <input type="text" className="form-control" id="website_whatsapp_no" placeholder={t('adminSettings:general.websiteWhatsappNo.placeholder')}
                           value={settings.website_whatsapp_no ?? ''} onChange={(e) => update('website_whatsapp_no', e.target.value)} />
                       </div>
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="android_app_link">Android App Link</label>
-                      <input type="text" className="form-control" id="android_app_link" placeholder="Android App Link"
+                      <label className="form-label" htmlFor="android_app_link">{t('adminSettings:general.androidAppLink.label')}</label>
+                      <input type="text" className="form-control" id="android_app_link" placeholder={t('adminSettings:general.androidAppLink.placeholder')}
                         value={settings.android_app_link ?? ''} onChange={(e) => update('android_app_link', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="ios_app_link">iOS App Link</label>
-                      <input type="text" className="form-control" id="ios_app_link" placeholder="iOS App Link"
+                      <label className="form-label" htmlFor="ios_app_link">{t('adminSettings:general.iosAppLink.label')}</label>
+                      <input type="text" className="form-control" id="ios_app_link" placeholder={t('adminSettings:general.iosAppLink.placeholder')}
                         value={settings.ios_app_link ?? ''} onChange={(e) => update('ios_app_link', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="android_app_link_merchant">Android App Link (Merchant)</label>
-                      <input type="text" className="form-control" id="android_app_link_merchant" placeholder="Android App Link Merchant"
+                      <label className="form-label" htmlFor="android_app_link_merchant">{t('adminSettings:general.androidAppLinkMerchant.label')}</label>
+                      <input type="text" className="form-control" id="android_app_link_merchant" placeholder={t('adminSettings:general.androidAppLinkMerchant.placeholder')}
                         value={settings.android_app_link_merchant ?? ''} onChange={(e) => update('android_app_link_merchant', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="ios_app_link_merchant">iOS App Link (Merchant)</label>
-                      <input type="text" className="form-control" id="ios_app_link_merchant" placeholder="iOS App Link Merchant"
+                      <label className="form-label" htmlFor="ios_app_link_merchant">{t('adminSettings:general.iosAppLinkMerchant.label')}</label>
+                      <input type="text" className="form-control" id="ios_app_link_merchant" placeholder={t('adminSettings:general.iosAppLinkMerchant.placeholder')}
                         value={settings.ios_app_link_merchant ?? ''} onChange={(e) => update('ios_app_link_merchant', e.target.value)} />
                     </div>
                     <div className="row">
                       <div className="mb-3 col-md-4">
-                        <label className="form-label" htmlFor="favicon_icon">Favicon Icon</label>
+                        <label className="form-label" htmlFor="favicon_icon">{t('adminSettings:general.faviconIcon.label')}</label>
                         <ImageUploadWithCropper
                           name="favicon_icon"
                           value={settings.favicon_icon ?? ''}
                           onChange={(url) => update('favicon_icon', url)}
                           aspectRatio="1/1"
                         />
-                        <div className="text-muted small mt-1">Square image (e.g. 1:1). Accepted: JPEG, PNG, GIF, WebP</div>
+                        <div className="text-muted small mt-1">{t('adminSettings:general.hints.favicon')}</div>
                       </div>
                       <div className="mb-3 col-md-4">
-                        <label className="form-label" htmlFor="website_logo">Website Logo</label>
+                        <label className="form-label" htmlFor="website_logo">{t('adminSettings:general.websiteLogo.label')}</label>
                         <ImageUploadWithCropper
                           name="website_logo"
                           value={settings.website_logo ?? ''}
                           onChange={(url) => update('website_logo', url)}
                         />
-                        <div className="text-muted small mt-1">Used on login, navbar, light areas. Accepted: JPEG, PNG, GIF, WebP</div>
+                        <div className="text-muted small mt-1">{t('adminSettings:general.hints.logoLight')}</div>
                       </div>
                       <div className="mb-3 col-md-4">
-                        <label className="form-label" htmlFor="website_white_logo">Website White Logo</label>
+                        <label className="form-label" htmlFor="website_white_logo">{t('adminSettings:general.websiteWhiteLogo.label')}</label>
                         <ImageUploadWithCropper
                           name="website_white_logo"
                           value={settings.website_white_logo ?? ''}
                           onChange={(url) => update('website_white_logo', url)}
                           className="bg-primary"
                         />
-                        <div className="text-muted small mt-1">For dark sidebar. Accepted: JPEG, PNG, GIF, WebP</div>
+                        <div className="text-muted small mt-1">{t('adminSettings:general.hints.logoDark')}</div>
                       </div>
                     </div>
                     {btnSave(saving)}
@@ -317,66 +319,66 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'default_setting' ? 'show active' : ''}`} id="default_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">Default Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:default.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleDefaultSubmit}>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="default_currency">Default Currency</label>
+                      <label className="form-label" htmlFor="default_currency">{t('adminSettings:default.defaultCurrency.label')}</label>
                       <AdminOptionsSelect
                         type="currency"
                         value={settings.default_currency ?? ''}
                         onChange={(v) => update('default_currency', v)}
-                        placeholder="Select currency"
+                        placeholder={t('adminSettings:default.defaultCurrency.placeholder')}
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="default_currency_position">Default Currency Position</label>
+                      <label className="form-label" htmlFor="default_currency_position">{t('adminSettings:default.defaultCurrencyPosition.label')}</label>
                       <ConfigSelect
                         optionsKey="currency_position"
                         id="default_currency_position"
                         value={settings.default_currency_position ?? ''}
                         onChange={(v) => update('default_currency_position', v)}
-                        placeholder="Select position"
+                        placeholder={t('adminSettings:default.defaultCurrencyPosition.placeholder')}
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="default_timezone">Default Timezone</label>
+                      <label className="form-label" htmlFor="default_timezone">{t('adminSettings:default.defaultTimezone.label')}</label>
                       <AdminOptionsSelect
                         type="timezone"
                         value={settings.default_timezone ?? ''}
                         onChange={(v) => update('default_timezone', v)}
-                        placeholder="Select timezone"
+                        placeholder={t('adminSettings:default.defaultTimezone.placeholder')}
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="date_format">Date Format</label>
+                      <label className="form-label" htmlFor="date_format">{t('adminSettings:default.dateFormat.label')}</label>
                       <ConfigSelect
                         optionsKey="date_format"
                         id="date_format"
                         value={settings.date_format ?? ''}
                         onChange={(v) => update('date_format', v)}
-                        placeholder="Select date format"
+                        placeholder={t('adminSettings:default.dateFormat.placeholder')}
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="time_format">Time Format</label>
+                      <label className="form-label" htmlFor="time_format">{t('adminSettings:default.timeFormat.label')}</label>
                       <ConfigSelect
                         optionsKey="time_format"
                         id="time_format"
                         value={settings.time_format ?? ''}
                         onChange={(v) => update('time_format', v)}
-                        placeholder="Select time format"
+                        placeholder={t('adminSettings:default.timeFormat.placeholder')}
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="datetime_format">Datetime Format</label>
+                      <label className="form-label" htmlFor="datetime_format">{t('adminSettings:default.datetimeFormat.label')}</label>
                       <ConfigSelect
                         optionsKey="datetime_format"
                         id="datetime_format"
                         value={settings.datetime_format ?? ''}
                         onChange={(v) => update('datetime_format', v)}
-                        placeholder="Select datetime format"
+                        placeholder={t('adminSettings:default.datetimeFormat.placeholder')}
                       />
                     </div>
                     {btnSave(saving)}
@@ -389,33 +391,33 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'default_pages_setting' ? 'show active' : ''}`} id="default_pages_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">Default Pages Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:defaultPages.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleDefaultPagesSubmit}>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="about_us">About Us</label>
-                      <textarea className="form-control" id="about_us" rows="6" placeholder="About Us"
+                      <label className="form-label" htmlFor="about_us">{t('adminSettings:defaultPages.aboutUs.label')}</label>
+                      <textarea className="form-control" id="about_us" rows="6" placeholder={t('adminSettings:defaultPages.aboutUs.placeholder')}
                         value={settings.about_us ?? ''} onChange={(e) => update('about_us', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="terms_and_condition">Terms and Condition</label>
-                      <textarea className="form-control" id="terms_and_condition" rows="6" placeholder="Terms and Condition"
+                      <label className="form-label" htmlFor="terms_and_condition">{t('adminSettings:defaultPages.termsAndCondition.label')}</label>
+                      <textarea className="form-control" id="terms_and_condition" rows="6" placeholder={t('adminSettings:defaultPages.termsAndCondition.placeholder')}
                         value={settings.terms_and_condition ?? ''} onChange={(e) => update('terms_and_condition', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="privacy_policy">Privacy Policy</label>
-                      <textarea className="form-control" id="privacy_policy" rows="6" placeholder="Privacy Policy"
+                      <label className="form-label" htmlFor="privacy_policy">{t('adminSettings:defaultPages.privacyPolicy.label')}</label>
+                      <textarea className="form-control" id="privacy_policy" rows="6" placeholder={t('adminSettings:defaultPages.privacyPolicy.placeholder')}
                         value={settings.privacy_policy ?? ''} onChange={(e) => update('privacy_policy', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="terms_and_condition_merchant">Terms and Condition (Merchant)</label>
-                      <textarea className="form-control" id="terms_and_condition_merchant" rows="6" placeholder="Terms and Condition Merchant"
+                      <label className="form-label" htmlFor="terms_and_condition_merchant">{t('adminSettings:defaultPages.termsAndConditionMerchant.label')}</label>
+                      <textarea className="form-control" id="terms_and_condition_merchant" rows="6" placeholder={t('adminSettings:defaultPages.termsAndConditionMerchant.placeholder')}
                         value={settings.terms_and_condition_merchant ?? ''} onChange={(e) => update('terms_and_condition_merchant', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="privacy_policy_merchant">Privacy Policy (Merchant)</label>
-                      <textarea className="form-control" id="privacy_policy_merchant" rows="6" placeholder="Privacy Policy Merchant"
+                      <label className="form-label" htmlFor="privacy_policy_merchant">{t('adminSettings:defaultPages.privacyPolicyMerchant.label')}</label>
+                      <textarea className="form-control" id="privacy_policy_merchant" rows="6" placeholder={t('adminSettings:defaultPages.privacyPolicyMerchant.placeholder')}
                         value={settings.privacy_policy_merchant ?? ''} onChange={(e) => update('privacy_policy_merchant', e.target.value)} />
                     </div>
                     {btnSave(saving)}
@@ -428,49 +430,49 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'email_setting' ? 'show active' : ''}`} id="email_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">Email Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:email.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleEmailSubmit}>
                     <div className="row">
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="mail_driver">Mail Driver</label>
-                        <input type="text" className="form-control" id="mail_driver" placeholder="Mail Driver"
+                        <label className="form-label" htmlFor="mail_driver">{t('adminSettings:email.mailDriver.label')}</label>
+                        <input type="text" className="form-control" id="mail_driver" placeholder={t('adminSettings:email.mailDriver.placeholder')}
                           value={settings.mail_driver ?? ''} onChange={(e) => update('mail_driver', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_host">SMTP Host</label>
-                        <input type="text" className="form-control" id="smtp_host" placeholder="SMTP Host"
+                        <label className="form-label" htmlFor="smtp_host">{t('adminSettings:email.smtpHost.label')}</label>
+                        <input type="text" className="form-control" id="smtp_host" placeholder={t('adminSettings:email.smtpHost.placeholder')}
                           value={settings.smtp_host ?? ''} onChange={(e) => update('smtp_host', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_port">SMTP Port</label>
-                        <input type="text" className="form-control" id="smtp_port" placeholder="SMTP Port"
+                        <label className="form-label" htmlFor="smtp_port">{t('adminSettings:email.smtpPort.label')}</label>
+                        <input type="text" className="form-control" id="smtp_port" placeholder={t('adminSettings:email.smtpPort.placeholder')}
                           value={settings.smtp_port ?? ''} onChange={(e) => update('smtp_port', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_encryption">SMTP Encryption</label>
-                        <input type="text" className="form-control" id="smtp_encryption" placeholder="e.g. tls, ssl"
+                        <label className="form-label" htmlFor="smtp_encryption">{t('adminSettings:email.smtpEncryption.label')}</label>
+                        <input type="text" className="form-control" id="smtp_encryption" placeholder={t('adminSettings:email.smtpEncryption.placeholder')}
                           value={settings.smtp_encryption ?? ''} onChange={(e) => update('smtp_encryption', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_username">SMTP Username</label>
-                        <input type="text" className="form-control" id="smtp_username" placeholder="SMTP Username"
+                        <label className="form-label" htmlFor="smtp_username">{t('adminSettings:email.smtpUsername.label')}</label>
+                        <input type="text" className="form-control" id="smtp_username" placeholder={t('adminSettings:email.smtpUsername.placeholder')}
                           value={settings.smtp_username ?? ''} onChange={(e) => update('smtp_username', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_password">SMTP Password</label>
-                        <input type="password" className="form-control" id="smtp_password" placeholder="SMTP Password"
+                        <label className="form-label" htmlFor="smtp_password">{t('adminSettings:email.smtpPassword.label')}</label>
+                        <input type="password" className="form-control" id="smtp_password" placeholder={t('adminSettings:email.smtpPassword.placeholder')}
                           value={settings.smtp_password ?? ''} onChange={(e) => update('smtp_password', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_from_email_address">From Email Address</label>
-                        <input type="text" className="form-control" id="smtp_from_email_address" placeholder="From Email"
+                        <label className="form-label" htmlFor="smtp_from_email_address">{t('adminSettings:email.fromEmailAddress.label')}</label>
+                        <input type="text" className="form-control" id="smtp_from_email_address" placeholder={t('adminSettings:email.fromEmailAddress.placeholder')}
                           value={settings.smtp_from_email_address ?? ''} onChange={(e) => update('smtp_from_email_address', e.target.value)} />
                       </div>
                       <div className="mb-3 col-md-6">
-                        <label className="form-label" htmlFor="smtp_from_name">From Name</label>
-                        <input type="text" className="form-control" id="smtp_from_name" placeholder="From Name"
+                        <label className="form-label" htmlFor="smtp_from_name">{t('adminSettings:email.fromName.label')}</label>
+                        <input type="text" className="form-control" id="smtp_from_name" placeholder={t('adminSettings:email.fromName.placeholder')}
                           value={settings.smtp_from_name ?? ''} onChange={(e) => update('smtp_from_name', e.target.value)} />
                       </div>
                     </div>
@@ -484,7 +486,7 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'sms_gateway_setting' ? 'show active' : ''}`} id="sms_gateway_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">SMS Gateway Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:smsGateway.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleSmsGatewaySubmit}>
@@ -492,7 +494,7 @@ const Settings = () => {
                       <div className="col-md-6">
                         <div className="card">
                           <div className="card-header header-elements">
-                            <h5 className="card-title mb-0">MSG91 Setting</h5>
+                            <h5 className="card-title mb-0">{t('adminSettings:smsGateway.msg91.title')}</h5>
                             <div className="card-action-element ms-auto">
                               <div className="form-check form-switch">
                                 <input className="form-check-input" type="checkbox" id="sms_msg91_active"
@@ -501,13 +503,13 @@ const Settings = () => {
                                     ...prev,
                                     msg91: { ...prev.msg91, active: e.target.checked ? '1' : '' }
                                   }))} />
-                                <label className="form-check-label" htmlFor="sms_msg91_active">Active</label>
+                                <label className="form-check-label" htmlFor="sms_msg91_active">{t('adminSettings:smsGateway.msg91.active')}</label>
                               </div>
                             </div>
                           </div>
                           <div className="card-body">
                             <div className="mb-3">
-                              <label className="form-label" htmlFor="sms_msg91_authkey">MSG91 Auth Key</label>
+                              <label className="form-label" htmlFor="sms_msg91_authkey">{t('adminSettings:smsGateway.msg91.authKey')}</label>
                               <input type="text" className="form-control" id="sms_msg91_authkey"
                                 value={smsGateway.msg91?.authkey ?? ''}
                                 onChange={(e) => setSmsGateway((prev) => ({
@@ -529,7 +531,7 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'whatsapp_gateway_setting' ? 'show active' : ''}`} id="whatsapp_gateway_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">WhatsApp Gateway Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:whatsappGateway.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleWhatsappGatewaySubmit}>
@@ -537,7 +539,7 @@ const Settings = () => {
                       <div className="col-md-6">
                         <div className="card">
                           <div className="card-header header-elements">
-                            <h5 className="card-title mb-0">Gallabox Setting</h5>
+                            <h5 className="card-title mb-0">{t('adminSettings:whatsappGateway.gallabox.title')}</h5>
                             <div className="card-action-element ms-auto">
                               <div className="form-check form-switch">
                                 <input className="form-check-input" type="checkbox" id="whatsapp_gallabox_active"
@@ -546,13 +548,13 @@ const Settings = () => {
                                     ...prev,
                                     gallabox: { ...prev.gallabox, active: e.target.checked ? '1' : '' }
                                   }))} />
-                                <label className="form-check-label" htmlFor="whatsapp_gallabox_active">Active</label>
+                                <label className="form-check-label" htmlFor="whatsapp_gallabox_active">{t('adminSettings:whatsappGateway.gallabox.active')}</label>
                               </div>
                             </div>
                           </div>
                           <div className="card-body">
                             <div className="mb-3">
-                              <label className="form-label" htmlFor="whatsapp_gallabox_api_key">API Key</label>
+                              <label className="form-label" htmlFor="whatsapp_gallabox_api_key">{t('adminSettings:whatsappGateway.gallabox.apiKey')}</label>
                               <input type="text" className="form-control" id="whatsapp_gallabox_api_key"
                                 value={whatsappGateway.gallabox?.api_key ?? ''}
                                 onChange={(e) => setWhatsappGateway((prev) => ({
@@ -561,7 +563,7 @@ const Settings = () => {
                                 }))} />
                             </div>
                             <div className="mb-3">
-                              <label className="form-label" htmlFor="whatsapp_gallabox_api_secret">API Secret</label>
+                              <label className="form-label" htmlFor="whatsapp_gallabox_api_secret">{t('adminSettings:whatsappGateway.gallabox.apiSecret')}</label>
                               <input type="text" className="form-control" id="whatsapp_gallabox_api_secret"
                                 value={whatsappGateway.gallabox?.api_secret ?? ''}
                                 onChange={(e) => setWhatsappGateway((prev) => ({
@@ -570,7 +572,7 @@ const Settings = () => {
                                 }))} />
                             </div>
                             <div className="mb-3">
-                              <label className="form-label" htmlFor="whatsapp_gallabox_channel_id">Channel ID</label>
+                              <label className="form-label" htmlFor="whatsapp_gallabox_channel_id">{t('adminSettings:whatsappGateway.gallabox.channelId')}</label>
                               <input type="text" className="form-control" id="whatsapp_gallabox_channel_id"
                                 value={whatsappGateway.gallabox?.channel_id ?? ''}
                                 onChange={(e) => setWhatsappGateway((prev) => ({
@@ -592,33 +594,33 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'social_link_setting' ? 'show active' : ''}`} id="social_link_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">Social Link Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:socialLinks.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleSocialLinkSubmit}>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="youtube_url">YouTube URL</label>
-                      <input type="text" className="form-control" id="youtube_url" placeholder="YouTube URL"
+                      <label className="form-label" htmlFor="youtube_url">{t('adminSettings:socialLinks.youtubeUrl.label')}</label>
+                      <input type="text" className="form-control" id="youtube_url" placeholder={t('adminSettings:socialLinks.youtubeUrl.placeholder')}
                         value={settings.youtube_url ?? ''} onChange={(e) => update('youtube_url', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="linkedin_url">LinkedIn URL</label>
-                      <input type="text" className="form-control" id="linkedin_url" placeholder="LinkedIn URL"
+                      <label className="form-label" htmlFor="linkedin_url">{t('adminSettings:socialLinks.linkedinUrl.label')}</label>
+                      <input type="text" className="form-control" id="linkedin_url" placeholder={t('adminSettings:socialLinks.linkedinUrl.placeholder')}
                         value={settings.linkedin_url ?? ''} onChange={(e) => update('linkedin_url', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="instagram_url">Instagram URL</label>
-                      <input type="text" className="form-control" id="instagram_url" placeholder="Instagram URL"
+                      <label className="form-label" htmlFor="instagram_url">{t('adminSettings:socialLinks.instagramUrl.label')}</label>
+                      <input type="text" className="form-control" id="instagram_url" placeholder={t('adminSettings:socialLinks.instagramUrl.placeholder')}
                         value={settings.instagram_url ?? ''} onChange={(e) => update('instagram_url', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="twitter_url">Twitter URL</label>
-                      <input type="text" className="form-control" id="twitter_url" placeholder="Twitter URL"
+                      <label className="form-label" htmlFor="twitter_url">{t('adminSettings:socialLinks.twitterUrl.label')}</label>
+                      <input type="text" className="form-control" id="twitter_url" placeholder={t('adminSettings:socialLinks.twitterUrl.placeholder')}
                         value={settings.twitter_url ?? ''} onChange={(e) => update('twitter_url', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="facebook_url">Facebook URL</label>
-                      <input type="text" className="form-control" id="facebook_url" placeholder="Facebook URL"
+                      <label className="form-label" htmlFor="facebook_url">{t('adminSettings:socialLinks.facebookUrl.label')}</label>
+                      <input type="text" className="form-control" id="facebook_url" placeholder={t('adminSettings:socialLinks.facebookUrl.placeholder')}
                         value={settings.facebook_url ?? ''} onChange={(e) => update('facebook_url', e.target.value)} />
                     </div>
                     {btnSave(saving)}
@@ -631,23 +633,23 @@ const Settings = () => {
             <div className={`tab-pane fade ${activeTab === 'queue_setting' ? 'show active' : ''}`} id="queue_setting" role="tabpanel">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title mb-0">Queue Setting</h5>
+                  <h5 className="card-title mb-0">{t('adminSettings:queue.title')}</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleQueueSubmit}>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="default_queue_time">Default Queue Time (minutes)</label>
-                      <input type="number" className="form-control" id="default_queue_time" placeholder="e.g. 15"
+                      <label className="form-label" htmlFor="default_queue_time">{t('adminSettings:queue.defaultQueueTime.label')}</label>
+                      <input type="number" className="form-control" id="default_queue_time" placeholder={t('adminSettings:queue.defaultQueueTime.placeholder')}
                         value={settings.default_queue_time ?? ''} onChange={(e) => update('default_queue_time', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="max_queue_size">Max Queue Size</label>
-                      <input type="number" className="form-control" id="max_queue_size" placeholder="e.g. 50"
+                      <label className="form-label" htmlFor="max_queue_size">{t('adminSettings:queue.maxQueueSize.label')}</label>
+                      <input type="number" className="form-control" id="max_queue_size" placeholder={t('adminSettings:queue.maxQueueSize.placeholder')}
                         value={settings.max_queue_size ?? ''} onChange={(e) => update('max_queue_size', e.target.value)} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label" htmlFor="advance_booking_days">Advance Booking Days</label>
-                      <input type="number" className="form-control" id="advance_booking_days" placeholder="e.g. 7"
+                      <label className="form-label" htmlFor="advance_booking_days">{t('adminSettings:queue.advanceBookingDays.label')}</label>
+                      <input type="number" className="form-control" id="advance_booking_days" placeholder={t('adminSettings:queue.advanceBookingDays.placeholder')}
                         value={settings.advance_booking_days ?? ''} onChange={(e) => update('advance_booking_days', e.target.value)} />
                     </div>
                     <div className="mb-3">
@@ -655,7 +657,7 @@ const Settings = () => {
                         <input className="form-check-input" type="checkbox" id="allow_queue_cancellation"
                           checked={settings.allow_queue_cancellation === '1' || settings.allow_queue_cancellation === true}
                           onChange={(e) => update('allow_queue_cancellation', e.target.checked ? '1' : '0')} />
-                        <label className="form-check-label" htmlFor="allow_queue_cancellation">Allow Queue Cancellation</label>
+                        <label className="form-check-label" htmlFor="allow_queue_cancellation">{t('adminSettings:queue.allowQueueCancellation')}</label>
                       </div>
                     </div>
                     <div className="mb-3">
@@ -663,7 +665,7 @@ const Settings = () => {
                         <input className="form-check-input" type="checkbox" id="auto_assign_queue_numbers"
                           checked={settings.auto_assign_queue_numbers === '1' || settings.auto_assign_queue_numbers === true}
                           onChange={(e) => update('auto_assign_queue_numbers', e.target.checked ? '1' : '0')} />
-                        <label className="form-check-label" htmlFor="auto_assign_queue_numbers">Auto Assign Queue Numbers</label>
+                        <label className="form-check-label" htmlFor="auto_assign_queue_numbers">{t('adminSettings:queue.autoAssignQueueNumbers')}</label>
                       </div>
                     </div>
                     {btnSave(saving)}

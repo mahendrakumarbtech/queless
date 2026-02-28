@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { usePublicSettings } from '../../context/PublicSettingsContext';
 import { AdminAuthWrapper } from './auth/AdminAuthWrapper';
 
 const AdminLogin = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -30,7 +32,7 @@ const AdminLogin = () => {
   if (authLoading || (isAuthenticated && isAdminPanelRole(role))) {
     return (
       <AdminAuthWrapper>
-        <p className="text-center text-muted">Redirecting...</p>
+        <p className="text-center text-muted">{t('adminAuth:redirecting')}</p>
       </AdminAuthWrapper>
     );
   }
@@ -69,14 +71,14 @@ const AdminLogin = () => {
         navigate('/admin');
       }
     } else {
-      setError(result.message || 'Login failed');
+      setError(result.message || t('adminAuth:login.loginFailed'));
     }
   };
 
   return (
     <AdminAuthWrapper>
-      <h4 className="mb-2">Welcome to {websiteName} Admin! 👋</h4>
-      <p className="mb-4">Please sign-in to your account and start the adventure</p>
+      <h4 className="mb-2">{t('adminAuth:login.title', { websiteName })}</h4>
+      <p className="mb-4">{t('adminAuth:login.subtitle')}</p>
 
       {error && (
         <div className="alert alert-danger py-2 mb-3" role="alert">
@@ -86,7 +88,7 @@ const AdminLogin = () => {
 
       <form id="formAuthentication" className="mb-3" onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email or Username</label>
+          <label htmlFor="email" className="form-label">{t('adminAuth:login.emailOrUsername')}</label>
           <input
             type="text"
             className="form-control"
@@ -94,15 +96,15 @@ const AdminLogin = () => {
             value={email}
             onChange={handleChange}
             name="email"
-            placeholder="Enter your email or username"
+            placeholder={t('adminAuth:login.emailOrUsernamePlaceholder')}
             autoFocus
           />
         </div>
         <div className="mb-3 form-password-toggle">
           <div className="d-flex justify-content-between">
-            <label className="form-label" htmlFor="password">Password</label>
+            <label className="form-label" htmlFor="password">{t('adminAuth:login.password')}</label>
             <Link to="/admin/forgot_password">
-              <small>Forgot Password?</small>
+              <small>{t('adminAuth:login.forgotPassword')}</small>
             </Link>
           </div>
           <div className="input-group input-group-merge">
@@ -130,7 +132,7 @@ const AdminLogin = () => {
               checked={rememberMe}
               onChange={handleChange}
             />
-            <label className="form-check-label" htmlFor="remember-me"> Remember Me </label>
+            <label className="form-check-label" htmlFor="remember-me"> {t('adminAuth:login.rememberMe')} </label>
           </div>
         </div>
         <div className="mb-3">
@@ -138,17 +140,17 @@ const AdminLogin = () => {
             type="submit"
             className="btn btn-primary d-grid w-100"
             disabled={loading}
-            aria-label="Sign in"
+            aria-label={t('adminAuth:login.signIn')}
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? t('adminAuth:login.signingIn') : t('adminAuth:login.signIn')}
           </button>
         </div>
       </form>
 
       <p className="text-center">
-        <span>Not admin? </span>
+        <span>{t('adminAuth:login.notAdmin')} </span>
         <Link to="/login" className="registration-link">
-          <span>Login as user</span>
+          <span>{t('adminAuth:login.loginAsUser')}</span>
         </Link>
       </p>
     </AdminAuthWrapper>

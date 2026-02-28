@@ -1,0 +1,28 @@
+{
+  "welcomeBack": "Welcome back, {{name}} 👋",
+  "subtitle": "Here's what's happening with your queue management system today.",
+  "stats": {
+    "totalUsers": "Total Users",
+    "providers": "Providers",
+    "activeQueues": "Active Queues",
+    "completed": "Completed",
+    "currentlyProcessing": "Currently processing"
+  },
+  "trends": {
+    "thisMonth": "+12% this month",
+    "new": "+5 new",
+    "today": "+24% today"
+  },
+  "sections": {
+    "recentUsers": "Recent Users",
+    "providers": "Providers"
+  },
+  "badges": {
+    "total": "{{count}} total"
+  },
+  "empty": {
+    "noUsers": "No users found",
+    "noProviders": "No providers found"
+  }
+}
+

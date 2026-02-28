@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { usePublicSettings } from '../context/PublicSettingsContext';
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, logout } = useAuth();
   const { websiteName } = usePublicSettings();
   const navigate = useNavigate();
@@ -53,12 +55,12 @@ const Navbar = () => {
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <Button color="inherit" component={Link} to="/providers">
-            Providers
+            {t('nav:providers')}
           </Button>
           {isAuthenticated ? (
             <>
               <Button color="inherit" component={Link} to={getDashboardLink()}>
-                Dashboard
+                {t('nav:dashboard')}
               </Button>
               <IconButton
                 size="large"
@@ -90,16 +92,16 @@ const Navbar = () => {
                     {user?.name} ({typeof user?.role === 'string' ? user.role : (user?.role?.name || 'user')})
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>{t('nav:logout')}</MenuItem>
               </Menu>
             </>
           ) : (
             <>
               <Button color="inherit" component={Link} to="/login">
-                Login
+                {t('nav:login')}
               </Button>
               <Button color="inherit" component={Link} to="/register">
-                Register
+                {t('nav:register')}
               </Button>
             </>
           )}

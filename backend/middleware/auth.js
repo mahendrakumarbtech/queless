@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const config = require('../config/config');
+const { getPermissionNamesForRole } = require('../helpers/rolePermissions');
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -19,7 +20,7 @@ exports.protect = async (req, res, next) => {
       const decoded = jwt.verify(token, config.JWT_SECRET);
       req.user = await User.findById(decoded.id)
         .select('-password')
-        .populate('role', 'name displayName permissions');
+        .populate('role', 'name displayName guard_name');
 
       if (!req.user || !req.user.isActive) {
         return res.status(401).json({ message: 'User not found or inactive' });
@@ -29,6 +30,9 @@ exports.protect = async (req, res, next) => {
       if (!req.user.role || !req.user.role.name) {
         return res.status(401).json({ message: 'User role not found' });
       }
+
+      // Spatie: permissions come from role_has_permissions table
+      req.user.role.permissions = await getPermissionNamesForRole(req.user.role._id);
 
       next();
     } catch (error) {

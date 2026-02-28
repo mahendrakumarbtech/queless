@@ -8,7 +8,6 @@ import { AuthProvider } from './context/AuthContext';
 import { PublicSettingsProvider, usePublicSettings } from './context/PublicSettingsContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
-import AdminLayout from './components/AdminLayout';
 import SneatLayout from './components/admin/SneatLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';

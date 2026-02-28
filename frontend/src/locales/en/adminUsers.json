@@ -1,0 +1,18 @@
+{
+  "titles": {
+    "management": "Users Management",
+    "filtered": "Users – {{role}}"
+  },
+  "searchPlaceholder": "Search users...",
+  "table": {
+    "user": "User",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "empty": {
+    "noUsers": "No users found"
+  }
+}
+

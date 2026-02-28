@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Role = require('../models/Role');
+const ModelHasRole = require('../models/ModelHasRole');
 const config = require('../config/config');
+const { getPermissionNamesForRole } = require('../helpers/rolePermissions');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -50,8 +52,15 @@ exports.register = async (req, res) => {
       providerType: roleDoc.name === 'provider' ? providerType : null
     });
 
-    // Populate role for response
-    await user.populate('role', 'name displayName permissions');
+    // Spatie: model_has_roles – assign role to user
+    await ModelHasRole.create({
+      roleId: roleDoc._id,
+      modelType: 'User',
+      modelId: user._id
+    });
+
+    await user.populate('role', 'name displayName guard_name');
+    user.role.permissions = await getPermissionNamesForRole(roleDoc._id);
 
     const token = generateToken(user._id);
 
@@ -102,7 +111,8 @@ exports.login = async (req, res) => {
 
     // Populate role - handle case where role might not exist
     try {
-      await user.populate('role', 'name displayName permissions');
+      await user.populate('role', 'name displayName guard_name');
+      user.role.permissions = await getPermissionNamesForRole(user.role._id);
     } catch (populateError) {
       console.error('Error populating role:', populateError);
     }
@@ -151,8 +161,10 @@ exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
       .populate('providerId')
-      .populate('role', 'name displayName permissions');
-    
+      .populate('role', 'name displayName guard_name');
+    if (user.role) {
+      user.role.permissions = await getPermissionNamesForRole(user.role._id);
+    }
     // Ensure role exists
     if (!user.role || !user.role.name) {
       return res.status(500).json({ 

@@ -1,47 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { usePublicSettings } from '../../context/PublicSettingsContext';
 import getGreetingMessage from '../../utils/greetingHandler';
+import LanguageSwitcher from '../LanguageSwitcher';
 import { loadAdminThemeAsync, unloadAdminTheme } from './admin-theme-loader';
 import './SneatLayout.css';
 
-const menuItems = [
-  { text: 'Dashboard', icon: 'bx bx-home', path: '/admin' },
+const getMenuItems = (t) => [
+  { text: t('menu:dashboard'), icon: 'bx bx-home', path: '/admin' },
   {
-    text: 'Role & Permission',
+    text: t('menu:rolePermission'),
     icon: 'bx bx-lock-alt',
     path: '/admin/roles',
   },
   {
-    text: 'Users',
+    text: t('menu:users'),
     icon: 'bx bx-user',
     path: '/admin/users',
     children: [
-      { text: 'Staff', path: '/admin/users/staff' },
-      { text: 'Provider', path: '/admin/users/provider' },
-      { text: 'Customer', path: '/admin/users/customer' },
+      { text: t('menu:staff'), path: '/admin/users/staff' },
+      { text: t('menu:provider'), path: '/admin/users/provider' },
+      { text: t('menu:customer'), path: '/admin/users/customer' },
     ],
   },
-  { text: 'Providers', icon: 'bx bx-building', path: '/admin/providers' },
-  { text: 'Queues', icon: 'bx bx-list-ul', path: '/admin/queues' },
-  { text: 'Settings', icon: 'bx bx-cog', path: '/admin/settings' },
+  { text: t('menu:providers'), icon: 'bx bx-building', path: '/admin/providers' },
+  { text: t('menu:queues'), icon: 'bx bx-list-ul', path: '/admin/queues' },
+  { text: t('menu:settings'), icon: 'bx bx-cog', path: '/admin/settings' },
 ];
 
-const AdminLayoutLoader = () => (
-  <div className="admin-theme-loader-wrap">
-    <div className="admin-theme-loader-spinner" aria-hidden="true" />
-    <p className="admin-theme-loader-text">Loading...</p>
-  </div>
-);
+const AdminLayoutLoader = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="admin-theme-loader-wrap">
+      <div className="admin-theme-loader-spinner" aria-hidden="true" />
+      <p className="admin-theme-loader-text">{t('common:loading')}</p>
+    </div>
+  );
+};
 
 const SneatLayout = ({ children }) => {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [themeReady, setThemeReady] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { websiteName, sidebarLogoUrl } = usePublicSettings();
+  const menuItems = getMenuItems(t);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,14 +88,14 @@ const SneatLayout = ({ children }) => {
                 <span className="app-brand-text demo menu-text fw-bold">{websiteName}</span>
               )}
             </Link>
-            <a
-              href="#"
+            <button
+              type="button"
               className="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none"
-              onClick={(e) => { e.preventDefault(); setSidebarOpen(!sidebarOpen); }}
-              aria-label="Toggle menu"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label={t('aria:toggleMenu')}
             >
               <i className="bx bx-chevron-left bx-sm align-middle"></i>
-            </a>
+            </button>
           </div>
 
           <div className="menu-inner-shadow"></div>
@@ -98,26 +105,26 @@ const SneatLayout = ({ children }) => {
               <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub menu-sub-open' : ''}`}>
                 {item.children ? (
                   <>
-                    <a
-                      href="#"
+                    <button
+                      type="button"
                       className="menu-link menu-toggle"
-                      onClick={(e) => { e.preventDefault(); }}
+                      onClick={() => {}}
                       aria-expanded="true"
                     >
                       <i className={`menu-icon tf-icons ${item.icon}`}></i>
-                      <div data-i18n={item.text}>{item.text}</div>
+                      <div>{item.text}</div>
                       <i className="menu-arrow tf-icons bx bx-chevron-down"></i>
-                    </a>
+                    </button>
                     <ul className="menu-sub">
                       <li className="menu-item">
                         <NavLink to={item.path} className="menu-link" onClick={closeSidebar}>
-                          <div data-i18n="All">All</div>
+                          <div>{t('menu:all')}</div>
                         </NavLink>
                       </li>
                       {item.children.map((sub) => (
                         <li key={sub.path} className="menu-item">
                           <NavLink to={sub.path} className="menu-link" onClick={closeSidebar}>
-                            <div data-i18n={sub.text}>{sub.text}</div>
+                            <div>{sub.text}</div>
                           </NavLink>
                         </li>
                       ))}
@@ -131,7 +138,7 @@ const SneatLayout = ({ children }) => {
                     aria-label={item.text}
                   >
                     <i className={`menu-icon tf-icons ${item.icon}`}></i>
-                    <div data-i18n={item.text}>{item.text}</div>
+                    <div>{item.text}</div>
                   </NavLink>
                 )}
               </li>
@@ -146,35 +153,36 @@ const SneatLayout = ({ children }) => {
             id="layout-navbar"
           >
             <div className="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-              <a
+              <button
+                type="button"
                 className="nav-item nav-link px-0 me-xl-4"
-                href="#"
-                onClick={(e) => { e.preventDefault(); setSidebarOpen(!sidebarOpen); }}
-                aria-label="Toggle sidebar"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={t('aria:toggleSidebar')}
               >
                 <i className="bx bx-menu bx-sm"></i>
-              </a>
+              </button>
             </div>
 
             <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
               {getGreetingMessage(user?.name?.split(' ')[0] || user?.name || 'Admin')}
               <ul className="navbar-nav flex-row align-items-center ms-auto">
+                <LanguageSwitcher />
                 <li className="nav-item navbar-dropdown dropdown-user dropdown">
-                  <a
+                  <button
+                    type="button"
                     className="nav-link dropdown-toggle hide-arrow"
-                    href="#"
                     data-bs-toggle="dropdown"
-                    aria-label="Profile menu"
+                    aria-label={t('aria:profileMenu')}
                   >
                     <div className="avatar avatar-online">
                       <span className="avatar-initial rounded-circle bg-label-primary">
                         {user?.name?.charAt(0).toUpperCase() || 'A'}
                       </span>
                     </div>
-                  </a>
+                  </button>
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <button type="button" className="dropdown-item">
                         <div className="d-flex">
                           <div className="flex-shrink-0 me-3">
                             <div className="avatar avatar-online">
@@ -185,39 +193,39 @@ const SneatLayout = ({ children }) => {
                           </div>
                           <div className="flex-grow-1">
                             <span className="fw-medium d-block">{user?.name || 'Admin'}</span>
-                            <small className="text-muted">Admin</small>
+                            <small className="text-muted">{t('common:admin')}</small>
                           </div>
                         </div>
-                      </a>
+                      </button>
                     </li>
                     <li><div className="dropdown-divider"></div></li>
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <button type="button" className="dropdown-item">
                         <i className="bx bx-user me-2"></i>
-                        <span className="align-middle">My Profile</span>
-                      </a>
+                        <span className="align-middle">{t('menu:myProfile')}</span>
+                      </button>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <button type="button" className="dropdown-item">
                         <i className="bx bx-cog me-2"></i>
-                        <span className="align-middle">Settings</span>
-                      </a>
+                        <span className="align-middle">{t('menu:settings')}</span>
+                      </button>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <button type="button" className="dropdown-item">
                         <span className="d-flex align-items-center align-middle">
                           <i className="bx bx-credit-card me-2 flex-shrink-0"></i>
-                          <span className="flex-grow-1 align-middle ms-1">Billing</span>
+                          <span className="flex-grow-1 align-middle ms-1">{t('menu:billing')}</span>
                           <span className="badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
                         </span>
-                      </a>
+                      </button>
                     </li>
                     <li><div className="dropdown-divider"></div></li>
                     <li>
-                      <a className="dropdown-item" href="#" onClick={handleLogout}>
+                      <button type="button" className="dropdown-item" onClick={handleLogout}>
                         <i className="bx bx-power-off me-2"></i>
-                        <span className="align-middle">Log Out</span>
-                      </a>
+                        <span className="align-middle">{t('menu:logOut')}</span>
+                      </button>
                     </li>
                   </ul>
                 </li>
@@ -234,7 +242,7 @@ const SneatLayout = ({ children }) => {
               <div className="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
                 <div className="mb-2 mb-md-0">
                   © {new Date().getFullYear()}, made with <span className="text-danger">❤️</span> by{' '}
-                  <a href="#" className="footer-link fw-medium">{websiteName}</a>
+                  <Link to="/admin" className="footer-link fw-medium">{websiteName}</Link>
                 </div>
               </div>
             </footer>
@@ -248,7 +256,7 @@ const SneatLayout = ({ children }) => {
           onKeyDown={(e) => e.key === 'Enter' && closeSidebar()}
           role="button"
           tabIndex={0}
-          aria-label="Close menu"
+          aria-label={t('aria:closeMenu')}
         />
       </div>
     </div>

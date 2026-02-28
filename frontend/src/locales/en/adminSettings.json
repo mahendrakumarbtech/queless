@@ -1,0 +1,106 @@
+{
+  "title": "Settings",
+  "messages": {
+    "saved": "Settings saved successfully",
+    "saveFailed": "Failed to save"
+  },
+  "buttons": {
+    "saving": "Saving...",
+    "saveChanges": "Save Changes"
+  },
+  "tabs": {
+    "general": "General Setting",
+    "default": "Default Setting",
+    "defaultPages": "Default Pages Setting",
+    "email": "Email Setting",
+    "smsGateway": "SMS Gateway Setting",
+    "whatsappGateway": "WhatsApp Gateway Setting",
+    "socialLinks": "Social Link Setting",
+    "queue": "Queue Setting"
+  },
+  "general": {
+    "title": "General Setting",
+    "websiteName": { "label": "Website Name", "placeholder": "Website Name" },
+    "websiteTagline": { "label": "Website Tagline", "placeholder": "Website Tagline" },
+    "contactPerson": { "label": "Contact Person", "placeholder": "Contact Person" },
+    "websiteEmail": { "label": "Website Email", "placeholder": "Website Email" },
+    "websiteTelephoneNo": { "label": "Website Telephone No", "placeholder": "Website Telephone No" },
+    "websiteMobileNo": { "label": "Website Mobile No", "placeholder": "Website Mobile No" },
+    "websiteWhatsappNo": { "label": "Website WhatsApp No", "placeholder": "Website WhatsApp No" },
+    "androidAppLink": { "label": "Android App Link", "placeholder": "Android App Link" },
+    "iosAppLink": { "label": "iOS App Link", "placeholder": "iOS App Link" },
+    "androidAppLinkMerchant": { "label": "Android App Link (Merchant)", "placeholder": "Android App Link Merchant" },
+    "iosAppLinkMerchant": { "label": "iOS App Link (Merchant)", "placeholder": "iOS App Link Merchant" },
+    "faviconIcon": { "label": "Favicon Icon" },
+    "websiteLogo": { "label": "Website Logo" },
+    "websiteWhiteLogo": { "label": "Website White Logo" },
+    "hints": {
+      "favicon": "Square image (e.g. 1:1). Accepted: JPEG, PNG, GIF, WebP",
+      "logoLight": "Used on login, navbar, light areas. Accepted: JPEG, PNG, GIF, WebP",
+      "logoDark": "For dark sidebar. Accepted: JPEG, PNG, GIF, WebP"
+    }
+  },
+  "default": {
+    "title": "Default Setting",
+    "defaultCurrency": { "label": "Default Currency", "placeholder": "Select currency" },
+    "defaultCurrencyPosition": { "label": "Default Currency Position", "placeholder": "Select position" },
+    "defaultTimezone": { "label": "Default Timezone", "placeholder": "Select timezone" },
+    "dateFormat": { "label": "Date Format", "placeholder": "Select date format" },
+    "timeFormat": { "label": "Time Format", "placeholder": "Select time format" },
+    "datetimeFormat": { "label": "Datetime Format", "placeholder": "Select datetime format" }
+  },
+  "defaultPages": {
+    "title": "Default Pages Setting",
+    "aboutUs": { "label": "About Us", "placeholder": "About Us" },
+    "termsAndCondition": { "label": "Terms and Condition", "placeholder": "Terms and Condition" },
+    "privacyPolicy": { "label": "Privacy Policy", "placeholder": "Privacy Policy" },
+    "termsAndConditionMerchant": { "label": "Terms and Condition (Merchant)", "placeholder": "Terms and Condition Merchant" },
+    "privacyPolicyMerchant": { "label": "Privacy Policy (Merchant)", "placeholder": "Privacy Policy Merchant" }
+  },
+  "email": {
+    "title": "Email Setting",
+    "mailDriver": { "label": "Mail Driver", "placeholder": "Mail Driver" },
+    "smtpHost": { "label": "SMTP Host", "placeholder": "SMTP Host" },
+    "smtpPort": { "label": "SMTP Port", "placeholder": "SMTP Port" },
+    "smtpEncryption": { "label": "SMTP Encryption", "placeholder": "e.g. tls, ssl" },
+    "smtpUsername": { "label": "SMTP Username", "placeholder": "SMTP Username" },
+    "smtpPassword": { "label": "SMTP Password", "placeholder": "SMTP Password" },
+    "fromEmailAddress": { "label": "From Email Address", "placeholder": "From Email" },
+    "fromName": { "label": "From Name", "placeholder": "From Name" }
+  },
+  "smsGateway": {
+    "title": "SMS Gateway Setting",
+    "msg91": {
+      "title": "MSG91 Setting",
+      "active": "Active",
+      "authKey": "MSG91 Auth Key"
+    }
+  },
+  "whatsappGateway": {
+    "title": "WhatsApp Gateway Setting",
+    "gallabox": {
+      "title": "Gallabox Setting",
+      "active": "Active",
+      "apiKey": "API Key",
+      "apiSecret": "API Secret",
+      "channelId": "Channel ID"
+    }
+  },
+  "socialLinks": {
+    "title": "Social Link Setting",
+    "youtubeUrl": { "label": "YouTube URL", "placeholder": "YouTube URL" },
+    "linkedinUrl": { "label": "LinkedIn URL", "placeholder": "LinkedIn URL" },
+    "instagramUrl": { "label": "Instagram URL", "placeholder": "Instagram URL" },
+    "twitterUrl": { "label": "Twitter URL", "placeholder": "Twitter URL" },
+    "facebookUrl": { "label": "Facebook URL", "placeholder": "Facebook URL" }
+  },
+  "queue": {
+    "title": "Queue Setting",
+    "defaultQueueTime": { "label": "Default Queue Time (minutes)", "placeholder": "e.g. 15" },
+    "maxQueueSize": { "label": "Max Queue Size", "placeholder": "e.g. 50" },
+    "advanceBookingDays": { "label": "Advance Booking Days", "placeholder": "e.g. 7" },
+    "allowQueueCancellation": "Allow Queue Cancellation",
+    "autoAssignQueueNumbers": "Auto Assign Queue Numbers"
+  }
+}
+

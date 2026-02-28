@@ -1,0 +1,8 @@
+{
+  "title": "Providers Management",
+  "searchPlaceholder": "Search providers...",
+  "empty": {
+    "noProviders": "No providers found"
+  }
+}
+

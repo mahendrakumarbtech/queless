@@ -17,7 +17,9 @@
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.16.0",
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "i18next": "^23.7.6",
+    "react-i18next": "^14.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Badge, Button } from 'react-bootstrap';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
@@ -8,6 +9,7 @@ import config from '../../config/config';
 const API_URL = config.API_URL;
 
 const Roles = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState(null);
@@ -26,7 +28,7 @@ const Roles = () => {
         setDeletingId(null);
       },
       onError: (err) => {
-        alert(err.response?.data?.message || 'Failed to delete');
+        alert(err.response?.data?.message || t('roles:deleteFailed'));
         setDeletingId(null);
       },
     }
@@ -34,10 +36,10 @@ const Roles = () => {
 
   const handleDelete = (role) => {
     if (role.isSystem) {
-      alert('System role cannot be deleted');
+      alert(t('roles:systemRoleNoDelete'));
       return;
     }
-    if (!window.confirm(`Delete role "${role.displayName}"?`)) return;
+    if (!window.confirm(t('roles:deleteConfirm', { name: role.displayName }))) return;
     setDeletingId(role._id);
     deleteMutation.mutate(role._id);
   };
@@ -45,13 +47,13 @@ const Roles = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">Role & Permission</h4>
+        <h4 className="fw-bold mb-0">{t('roles:title')}</h4>
         <Button
           variant="primary"
           as={Link}
           to="/admin/roles/create"
         >
-          <i className="bx bx-plus me-1"></i> Create Role
+          <i className="bx bx-plus me-1"></i> {t('roles:createRole')}
         </Button>
       </div>
 
@@ -60,26 +62,26 @@ const Roles = () => {
           {isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('common:loading')}</span>
               </div>
             </div>
           ) : (
             <div className="table-responsive">
               <Table hover>
-                <thead>
-                  <tr>
-                    <th>Role Name</th>
-                    <th>Display Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th className="text-end">Actions</th>
+<thead>
+                <tr>
+                    <th>{t('roles:roleName')}</th>
+                    <th>{t('roles:displayName')}</th>
+                    <th>{t('roles:description')}</th>
+                    <th>{t('common:status')}</th>
+                    <th className="text-end">{t('common:actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {roles.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-4">
-                        No roles found
+                        {t('roles:noRoles')}
                       </td>
                     </tr>
                   ) : (
@@ -90,10 +92,10 @@ const Roles = () => {
                         <td className="text-muted small">{role.description || '–'}</td>
                         <td>
                           <Badge bg={role.isActive ? 'success' : 'secondary'}>
-                            {role.isActive ? 'Active' : 'Inactive'}
+                            {role.isActive ? t('common:active') : t('common:inactive')}
                           </Badge>
                           {role.isSystem && (
-                            <Badge bg="info" className="ms-1">System</Badge>
+                            <Badge bg="info" className="ms-1">{t('common:system')}</Badge>
                           )}
                         </td>
                         <td className="text-end">

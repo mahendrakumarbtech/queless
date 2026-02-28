@@ -3,6 +3,7 @@ const Provider = require('../models/Provider');
 const Queue = require('../models/Queue');
 const Settings = require('../models/Settings');
 const Role = require('../models/Role');
+const ModelHasRole = require('../models/ModelHasRole');
 
 // @desc    Get all users
 // @route   GET /api/admin/users
@@ -25,7 +26,7 @@ exports.getUsers = async (req, res) => {
 
     const users = await User.find(query)
       .populate('providerId')
-      .populate('role', 'name displayName permissions')
+      .populate('role', 'name displayName guard_name')
       .select('-password')
       .sort({ createdAt: -1 });
 
@@ -57,10 +58,19 @@ exports.updateUser = async (req, res) => {
       req.params.id,
       req.body,
       { new: true, runValidators: true }
-    ).select('-password');
+    ).select('-password').populate('role', 'name displayName guard_name');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Spatie: sync model_has_roles when role is updated
+    if (req.body.role != null) {
+      await ModelHasRole.findOneAndUpdate(
+        { modelType: 'User', modelId: req.params.id },
+        { roleId: req.body.role },
+        { upsert: true }
+      );
     }
 
     res.json({

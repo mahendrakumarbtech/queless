@@ -1,0 +1,28 @@
+{
+  "redirecting": "Redirecting...",
+  "login": {
+    "title": "Welcome to {{websiteName}} Admin! 👋",
+    "subtitle": "Please sign-in to your account and start the adventure",
+    "emailOrUsername": "Email or Username",
+    "emailOrUsernamePlaceholder": "Enter your email or username",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "loginFailed": "Login failed",
+    "notAdmin": "Not admin?",
+    "loginAsUser": "Login as user"
+  },
+  "forgot": {
+    "title": "Forgot Password? 🔒",
+    "subtitle": "Enter your email and we'll send you instructions to reset your password",
+    "infoMessage": "If an account exists for this email, you will receive reset instructions.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "sendResetLink": "Send Reset Link",
+    "sending": "Sending...",
+    "backToLogin": "Back to login"
+  }
+}
+

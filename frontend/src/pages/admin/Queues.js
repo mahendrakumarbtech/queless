@@ -3,11 +3,13 @@ import { Card, Table, Badge } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
 
 const API_URL = config.API_URL;
 
 const Queues = () => {
+  const { t } = useTranslation();
   const { data: queues, isLoading } = useQuery('adminQueues', async () => {
     const response = await axios.get(`${API_URL}/admin/queues`);
     return response.data.data || [];
@@ -30,14 +32,14 @@ const Queues = () => {
 
   return (
     <div>
-      <h4 className="fw-bold mb-4">Queue Management</h4>
+      <h4 className="fw-bold mb-4">{t('adminQueues:title')}</h4>
 
       <Card>
         <Card.Body>
           {isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('common:loading')}</span>
               </div>
             </div>
           ) : (
@@ -45,26 +47,26 @@ const Queues = () => {
               <Table hover>
                 <thead>
                   <tr>
-                    <th>Queue #</th>
-                    <th>Customer</th>
-                    <th>Provider</th>
-                    <th>Date</th>
-                    <th>Status</th>
+                    <th>{t('adminQueues:table.queueNo')}</th>
+                    <th>{t('adminQueues:table.customer')}</th>
+                    <th>{t('adminQueues:table.provider')}</th>
+                    <th>{t('adminQueues:table.date')}</th>
+                    <th>{t('adminQueues:table.status')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {!queues || queues.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-4">
-                        No queues found
+                        {t('adminQueues:empty.noQueues')}
                       </td>
                     </tr>
                   ) : (
                     queues.map((queue) => (
                       <tr key={queue._id}>
                         <td className="fw-bold">#{queue.queueNumber}</td>
-                        <td>{queue.customerId?.name || 'N/A'}</td>
-                        <td>{queue.providerId?.name || 'N/A'}</td>
+                        <td>{queue.customerId?.name || t('adminQueues:na')}</td>
+                        <td>{queue.providerId?.name || t('adminQueues:na')}</td>
                         <td>{moment(queue.date).format('MMM DD, YYYY')}</td>
                         <td>
                           <Badge bg={getStatusColor(queue.status)}>

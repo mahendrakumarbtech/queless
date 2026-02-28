@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Row, Col, Badge } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import config from '../../config/config';
 
@@ -33,6 +34,7 @@ const StatCard = ({ title, value, icon, color, trend, subtitle }) => (
 );
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const { data: dashboardStats, isLoading } = useQuery(
@@ -58,7 +60,7 @@ const AdminDashboard = () => {
     return (
       <div className="text-center py-5">
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common:loading')}</span>
         </div>
       </div>
     );
@@ -84,9 +86,11 @@ const AdminDashboard = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h4 className="fw-bold mb-1">Welcome back, {user?.name} 👋</h4>
+          <h4 className="fw-bold mb-1">
+            {t('adminDashboard:welcomeBack', { name: user?.name || t('common:admin') })}
+          </h4>
           <p className="text-muted mb-0">
-            Here's what's happening with your queue management system today.
+            {t('adminDashboard:subtitle')}
           </p>
         </div>
       </div>
@@ -94,38 +98,38 @@ const AdminDashboard = () => {
       <Row className="mb-4">
         <Col xs={12} sm={6} lg={3}>
           <StatCard
-            title="Total Users"
+            title={t('adminDashboard:stats.totalUsers')}
             value={stats.totalUsers || 0}
             icon="bi-people"
             color="primary"
-            trend="+12% this month"
+            trend={t('adminDashboard:trends.thisMonth')}
           />
         </Col>
         <Col xs={12} sm={6} lg={3}>
           <StatCard
-            title="Providers"
+            title={t('adminDashboard:stats.providers')}
             value={stats.totalProviders || 0}
             icon="bi-building"
             color="info"
-            trend="+5 new"
+            trend={t('adminDashboard:trends.new')}
           />
         </Col>
         <Col xs={12} sm={6} lg={3}>
           <StatCard
-            title="Active Queues"
+            title={t('adminDashboard:stats.activeQueues')}
             value={stats.activeQueues || 0}
             icon="bi-clock-history"
             color="warning"
-            subtitle="Currently processing"
+            subtitle={t('adminDashboard:stats.currentlyProcessing')}
           />
         </Col>
         <Col xs={12} sm={6} lg={3}>
           <StatCard
-            title="Completed"
+            title={t('adminDashboard:stats.completed')}
             value={stats.completedQueues || 0}
             icon="bi-check-circle"
             color="success"
-            trend="+24% today"
+            trend={t('adminDashboard:trends.today')}
           />
         </Col>
       </Row>
@@ -134,8 +138,8 @@ const AdminDashboard = () => {
         <Col xs={12} lg={6} className="mb-4">
           <Card>
             <Card.Header className="d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Recent Users</h5>
-              <Badge bg="primary">{users?.length || 0} total</Badge>
+              <h5 className="mb-0">{t('adminDashboard:sections.recentUsers')}</h5>
+              <Badge bg="primary">{t('adminDashboard:badges.total', { count: users?.length || 0 })}</Badge>
             </Card.Header>
             <Card.Body>
               {recentUsers.length > 0 ? (
@@ -161,7 +165,7 @@ const AdminDashboard = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted text-center py-4">No users found</p>
+                <p className="text-muted text-center py-4">{t('adminDashboard:empty.noUsers')}</p>
               )}
             </Card.Body>
           </Card>
@@ -170,8 +174,8 @@ const AdminDashboard = () => {
         <Col xs={12} lg={6} className="mb-4">
           <Card>
             <Card.Header className="d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Providers</h5>
-              <Badge bg="primary">{providers?.length || 0} total</Badge>
+              <h5 className="mb-0">{t('adminDashboard:sections.providers')}</h5>
+              <Badge bg="primary">{t('adminDashboard:badges.total', { count: providers?.length || 0 })}</Badge>
             </Card.Header>
             <Card.Body>
               {recentProviders.length > 0 ? (
@@ -191,13 +195,13 @@ const AdminDashboard = () => {
                         <small className="text-muted">{provider.providerType}</small>
                       </div>
                       <Badge bg={provider.isActive ? 'success' : 'secondary'}>
-                        {provider.isActive ? 'Active' : 'Inactive'}
+                        {provider.isActive ? t('common:active') : t('common:inactive')}
                       </Badge>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-muted text-center py-4">No providers found</p>
+                <p className="text-muted text-center py-4">{t('adminDashboard:empty.noProviders')}</p>
               )}
             </Card.Body>
           </Card>

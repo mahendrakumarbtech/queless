@@ -1,0 +1,15 @@
+{
+  "title": "Queue Management",
+  "table": {
+    "queueNo": "Queue #",
+    "customer": "Customer",
+    "provider": "Provider",
+    "date": "Date",
+    "status": "Status"
+  },
+  "empty": {
+    "noQueues": "No queues found"
+  },
+  "na": "N/A"
+}
+

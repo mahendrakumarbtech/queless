@@ -1,0 +1,23 @@
+{
+  "title": "भूमिका और अनुमति",
+  "createRole": "भूमिका बनाएं",
+  "editRole": "भूमिका संपादित करें",
+  "roleName": "भूमिका का नाम",
+  "displayName": "प्रदर्शन नाम",
+  "description": "विवरण",
+  "permissions": "अनुमतियाँ",
+  "selectAll": "सभी चुनें",
+  "deselectAll": "सभी अचयनित करें",
+  "noRoles": "कोई भूमिका नहीं मिली",
+  "systemRoleNoDelete": "सिस्टम भूमिका हटाई नहीं जा सकती",
+  "deleteConfirm": "भूमिका \"{{name}}\" हटाएं?",
+  "deleteFailed": "हटाने में विफल",
+  "updated": "भूमिका सफलतापूर्वक अद्यतन",
+  "created": "भूमिका सफलतापूर्वक बनाई गई",
+  "saveFailed": "सहेजने में विफल",
+  "loadFailed": "लोड करने में विफल",
+  "namePlaceholder": "जैसे manager",
+  "displayNamePlaceholder": "जैसे Manager",
+  "updateRole": "भूमिका अद्यतन करें",
+  "nameCannotChange": "नाम बदला नहीं जा सकता"
+}

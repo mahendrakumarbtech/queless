@@ -1,0 +1,106 @@
+{
+  "title": "सेटिंग्स",
+  "messages": {
+    "saved": "सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "saveFailed": "सहेजने में विफल"
+  },
+  "buttons": {
+    "saving": "सहेजा जा रहा है...",
+    "saveChanges": "परिवर्तन सहेजें"
+  },
+  "tabs": {
+    "general": "सामान्य सेटिंग",
+    "default": "डिफ़ॉल्ट सेटिंग",
+    "defaultPages": "डिफ़ॉल्ट पेज सेटिंग",
+    "email": "ईमेल सेटिंग",
+    "smsGateway": "SMS गेटवे सेटिंग",
+    "whatsappGateway": "WhatsApp गेटवे सेटिंग",
+    "socialLinks": "सोशल लिंक सेटिंग",
+    "queue": "कतार सेटिंग"
+  },
+  "general": {
+    "title": "सामान्य सेटिंग",
+    "websiteName": { "label": "वेबसाइट नाम", "placeholder": "वेबसाइट नाम" },
+    "websiteTagline": { "label": "वेबसाइट टैगलाइन", "placeholder": "वेबसाइट टैगलाइन" },
+    "contactPerson": { "label": "संपर्क व्यक्ति", "placeholder": "संपर्क व्यक्ति" },
+    "websiteEmail": { "label": "वेबसाइट ईमेल", "placeholder": "वेबसाइट ईमेल" },
+    "websiteTelephoneNo": { "label": "वेबसाइट टेलीफोन नंबर", "placeholder": "वेबसाइट टेलीफोन नंबर" },
+    "websiteMobileNo": { "label": "वेबसाइट मोबाइल नंबर", "placeholder": "वेबसाइट मोबाइल नंबर" },
+    "websiteWhatsappNo": { "label": "वेबसाइट WhatsApp नंबर", "placeholder": "वेबसाइट WhatsApp नंबर" },
+    "androidAppLink": { "label": "Android ऐप लिंक", "placeholder": "Android ऐप लिंक" },
+    "iosAppLink": { "label": "iOS ऐप लिंक", "placeholder": "iOS ऐप लिंक" },
+    "androidAppLinkMerchant": { "label": "Android ऐप लिंक (Merchant)", "placeholder": "Android ऐप लिंक (Merchant)" },
+    "iosAppLinkMerchant": { "label": "iOS ऐप लिंक (Merchant)", "placeholder": "iOS ऐप लिंक (Merchant)" },
+    "faviconIcon": { "label": "फेविकॉन आइकन" },
+    "websiteLogo": { "label": "वेबसाइट लोगो" },
+    "websiteWhiteLogo": { "label": "वेबसाइट व्हाइट लोगो" },
+    "hints": {
+      "favicon": "स्क्वेयर इमेज (जैसे 1:1). स्वीकार्य: JPEG, PNG, GIF, WebP",
+      "logoLight": "लॉगिन/नेवबार/लाइट एरिया में उपयोग. स्वीकार्य: JPEG, PNG, GIF, WebP",
+      "logoDark": "डार्क साइडबार के लिए. स्वीकार्य: JPEG, PNG, GIF, WebP"
+    }
+  },
+  "default": {
+    "title": "डिफ़ॉल्ट सेटिंग",
+    "defaultCurrency": { "label": "डिफ़ॉल्ट मुद्रा", "placeholder": "मुद्रा चुनें" },
+    "defaultCurrencyPosition": { "label": "डिफ़ॉल्ट मुद्रा स्थिति", "placeholder": "स्थिति चुनें" },
+    "defaultTimezone": { "label": "डिफ़ॉल्ट टाइमज़ोन", "placeholder": "टाइमज़ोन चुनें" },
+    "dateFormat": { "label": "डेट फॉर्मेट", "placeholder": "डेट फॉर्मेट चुनें" },
+    "timeFormat": { "label": "टाइम फॉर्मेट", "placeholder": "टाइम फॉर्मेट चुनें" },
+    "datetimeFormat": { "label": "डेटटाइम फॉर्मेट", "placeholder": "डेटटाइम फॉर्मेट चुनें" }
+  },
+  "defaultPages": {
+    "title": "डिफ़ॉल्ट पेज सेटिंग",
+    "aboutUs": { "label": "हमारे बारे में", "placeholder": "हमारे बारे में" },
+    "termsAndCondition": { "label": "नियम और शर्तें", "placeholder": "नियम और शर्तें" },
+    "privacyPolicy": { "label": "गोपनीयता नीति", "placeholder": "गोपनीयता नीति" },
+    "termsAndConditionMerchant": { "label": "नियम और शर्तें (Merchant)", "placeholder": "नियम और शर्तें (Merchant)" },
+    "privacyPolicyMerchant": { "label": "गोपनीयता नीति (Merchant)", "placeholder": "गोपनीयता नीति (Merchant)" }
+  },
+  "email": {
+    "title": "ईमेल सेटिंग",
+    "mailDriver": { "label": "मेल ड्राइवर", "placeholder": "मेल ड्राइवर" },
+    "smtpHost": { "label": "SMTP होस्ट", "placeholder": "SMTP होस्ट" },
+    "smtpPort": { "label": "SMTP पोर्ट", "placeholder": "SMTP पोर्ट" },
+    "smtpEncryption": { "label": "SMTP एन्क्रिप्शन", "placeholder": "जैसे tls, ssl" },
+    "smtpUsername": { "label": "SMTP यूज़रनेम", "placeholder": "SMTP यूज़रनेम" },
+    "smtpPassword": { "label": "SMTP पासवर्ड", "placeholder": "SMTP पासवर्ड" },
+    "fromEmailAddress": { "label": "From ईमेल पता", "placeholder": "From ईमेल" },
+    "fromName": { "label": "From नाम", "placeholder": "From नाम" }
+  },
+  "smsGateway": {
+    "title": "SMS गेटवे सेटिंग",
+    "msg91": {
+      "title": "MSG91 सेटिंग",
+      "active": "सक्रिय",
+      "authKey": "MSG91 Auth Key"
+    }
+  },
+  "whatsappGateway": {
+    "title": "WhatsApp गेटवे सेटिंग",
+    "gallabox": {
+      "title": "Gallabox सेटिंग",
+      "active": "सक्रिय",
+      "apiKey": "API Key",
+      "apiSecret": "API Secret",
+      "channelId": "Channel ID"
+    }
+  },
+  "socialLinks": {
+    "title": "सोशल लिंक सेटिंग",
+    "youtubeUrl": { "label": "YouTube URL", "placeholder": "YouTube URL" },
+    "linkedinUrl": { "label": "LinkedIn URL", "placeholder": "LinkedIn URL" },
+    "instagramUrl": { "label": "Instagram URL", "placeholder": "Instagram URL" },
+    "twitterUrl": { "label": "Twitter URL", "placeholder": "Twitter URL" },
+    "facebookUrl": { "label": "Facebook URL", "placeholder": "Facebook URL" }
+  },
+  "queue": {
+    "title": "कतार सेटिंग",
+    "defaultQueueTime": { "label": "डिफ़ॉल्ट कतार समय (मिनट)", "placeholder": "जैसे 15" },
+    "maxQueueSize": { "label": "अधिकतम कतार आकार", "placeholder": "जैसे 50" },
+    "advanceBookingDays": { "label": "एडवांस बुकिंग दिन", "placeholder": "जैसे 7" },
+    "allowQueueCancellation": "कतार रद्द करने की अनुमति",
+    "autoAssignQueueNumbers": "ऑटो कतार नंबर असाइन करें"
+  }
+}
+

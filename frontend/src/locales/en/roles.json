@@ -1,0 +1,23 @@
+{
+  "title": "Role & Permission",
+  "createRole": "Create Role",
+  "editRole": "Edit Role",
+  "roleName": "Role Name",
+  "displayName": "Display Name",
+  "description": "Description",
+  "permissions": "Permissions",
+  "selectAll": "Select All",
+  "deselectAll": "Deselect All",
+  "noRoles": "No roles found",
+  "systemRoleNoDelete": "System role cannot be deleted",
+  "deleteConfirm": "Delete role \"{{name}}\"?",
+  "deleteFailed": "Failed to delete",
+  "updated": "Role updated successfully",
+  "created": "Role created successfully",
+  "saveFailed": "Failed to save",
+  "loadFailed": "Failed to load",
+  "namePlaceholder": "e.g. manager",
+  "displayNamePlaceholder": "e.g. Manager",
+  "updateRole": "Update Role",
+  "nameCannotChange": "Name cannot be changed"
+}

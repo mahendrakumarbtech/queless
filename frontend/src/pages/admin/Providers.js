@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Card, Row, Col, Form, InputGroup, Badge, Button } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
 
 const API_URL = config.API_URL;
 
 const Providers = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: providers, isLoading } = useQuery('adminProviders', async () => {
@@ -23,13 +25,13 @@ const Providers = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">Providers Management</h4>
+        <h4 className="fw-bold mb-0">{t('adminProviders:title')}</h4>
         <InputGroup style={{ width: '300px' }}>
           <InputGroup.Text>
             <i className="bi bi-search"></i>
           </InputGroup.Text>
           <Form.Control
-            placeholder="Search providers..."
+            placeholder={t('adminProviders:searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -39,7 +41,7 @@ const Providers = () => {
       {isLoading ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('common:loading')}</span>
           </div>
         </div>
       ) : (
@@ -48,7 +50,7 @@ const Providers = () => {
             <Col xs={12}>
               <Card>
                 <Card.Body>
-                  <p className="text-muted text-center py-4 mb-0">No providers found</p>
+                  <p className="text-muted text-center py-4 mb-0">{t('adminProviders:empty.noProviders')}</p>
                 </Card.Body>
               </Card>
             </Col>
@@ -80,7 +82,7 @@ const Providers = () => {
                     </div>
                     <div className="d-flex gap-2 flex-wrap">
                       <Badge bg={provider.isActive ? 'success' : 'secondary'}>
-                        {provider.isActive ? 'Active' : 'Inactive'}
+                        {provider.isActive ? t('common:active') : t('common:inactive')}
                       </Badge>
                       {provider.address?.city && (
                         <Badge bg="info" className="text-white">

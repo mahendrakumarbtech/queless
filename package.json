@@ -10,6 +10,8 @@
     "dev-frontend": "cd frontend && npm start",
     "start-backend": "cd backend && npm start",
     "build-frontend": "cd frontend && npm run build",
+    "seed": "cd backend && npm run seed",
+    "db:fresh": "cd backend && npm run db:fresh",
     "setup": "bash start.sh"
   },
   "keywords": ["queue", "management", "mern", "react", "node"],

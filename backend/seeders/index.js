@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const config = require('../config/config');
 
+const seedPermissions = require('./permissionSeeder');
 const seedRoles = require('./roleSeeder');
 const seedAdmin = require('./adminSeeder');
 const seedSettings = require('./settingsSeeder');
@@ -17,7 +18,11 @@ const runSeeders = async () => {
     });
     console.log('✅ Connected to MongoDB\n');
 
-    // Run seeders
+    // Run seeders (permissions first, then roles reference permission names)
+    console.log('🔐 Seeding Permissions...');
+    await seedPermissions();
+    console.log('');
+
     console.log('👥 Seeding Roles...');
     await seedRoles();
     console.log('');
@@ -52,4 +57,4 @@ if (require.main === module) {
   runSeeders();
 }
 
-module.exports = { runSeeders, seedAdmin, seedSettings, seedSampleData };
+module.exports = { runSeeders, seedPermissions, seedAdmin, seedSettings, seedSampleData };

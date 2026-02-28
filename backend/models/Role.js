@@ -1,11 +1,20 @@
 const mongoose = require('mongoose');
 
+/**
+ * Role model – Spatie-style.
+ * role_has_permissions: permissions array stores permission names (sync from Permission table).
+ */
 const roleSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
     lowercase: true,
+    trim: true
+  },
+  guard_name: {
+    type: String,
+    required: true,
+    default: 'admin',
     trim: true
   },
   displayName: {
@@ -16,25 +25,7 @@ const roleSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  permissions: [{
-    type: String,
-    enum: [
-      'users.read',
-      'users.write',
-      'users.delete',
-      'providers.read',
-      'providers.write',
-      'providers.delete',
-      'queues.read',
-      'queues.write',
-      'queues.delete',
-      'settings.read',
-      'settings.write',
-      'roles.read',
-      'roles.write',
-      'admin.access'
-    ]
-  }],
+  // Permissions come from role_has_permissions table (RolePermission), not stored here
   isActive: {
     type: Boolean,
     default: true
@@ -60,7 +51,7 @@ roleSchema.pre('save', function(next) {
 });
 
 // Index for faster queries
-roleSchema.index({ name: 1 });
+roleSchema.index({ name: 1, guard_name: 1 }, { unique: true });
 roleSchema.index({ isActive: 1 });
 
 module.exports = mongoose.model('Role', roleSchema);

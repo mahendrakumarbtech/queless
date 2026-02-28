@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom';
 import { Card, Table, Form, InputGroup, Badge, Button } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
 
 const API_URL = config.API_URL;
 
-const roleFilterLabels = { staff: 'Staff', provider: 'Provider', customer: 'Customer' };
-
 const Users = () => {
+  const { t } = useTranslation();
   const { roleFilter } = useParams(); // staff | provider | customer from path /admin/users/:roleFilter
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -26,7 +26,7 @@ const Users = () => {
       : (user.role?.name || 'customer')
   })) || [];
 
-  if (roleFilter && roleFilterLabels[roleFilter]) {
+  if (roleFilter && ['staff', 'provider', 'customer'].includes(roleFilter)) {
     normalizedUsers = normalizedUsers.filter((u) => u.role === roleFilter);
   }
 
@@ -53,20 +53,29 @@ const Users = () => {
     }
   };
 
+  const roleLabel =
+    roleFilter === 'staff'
+      ? t('menu:staff')
+      : roleFilter === 'provider'
+        ? t('menu:provider')
+        : roleFilter === 'customer'
+          ? t('menu:customer')
+          : '';
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4 className="fw-bold mb-0">
-          {roleFilter && roleFilterLabels[roleFilter]
-            ? `Users – ${roleFilterLabels[roleFilter]}`
-            : 'Users Management'}
+          {roleFilter
+            ? t('adminUsers:titles.filtered', { role: roleLabel })
+            : t('adminUsers:titles.management')}
         </h4>
         <InputGroup style={{ width: '300px' }}>
           <InputGroup.Text>
             <i className="bi bi-search"></i>
           </InputGroup.Text>
           <Form.Control
-            placeholder="Search users..."
+            placeholder={t('adminUsers:searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -78,7 +87,7 @@ const Users = () => {
           {isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('common:loading')}</span>
               </div>
             </div>
           ) : (
@@ -86,18 +95,18 @@ const Users = () => {
               <Table hover>
                 <thead>
                   <tr>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th className="text-end">Actions</th>
+                    <th>{t('adminUsers:table.user')}</th>
+                    <th>{t('adminUsers:table.email')}</th>
+                    <th>{t('adminUsers:table.role')}</th>
+                    <th>{t('adminUsers:table.status')}</th>
+                    <th className="text-end">{t('adminUsers:table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredUsers.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-4">
-                        No users found
+                        {t('adminUsers:empty.noUsers')}
                       </td>
                     </tr>
                   ) : (
@@ -123,7 +132,7 @@ const Users = () => {
                         </td>
                         <td>
                           <Badge bg={user.isActive ? 'success' : 'secondary'}>
-                            {user.isActive ? 'Active' : 'Inactive'}
+                            {user.isActive ? t('common:active') : t('common:inactive')}
                           </Badge>
                         </td>
                         <td className="text-end">

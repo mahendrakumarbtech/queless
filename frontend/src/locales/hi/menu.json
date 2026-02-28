@@ -1,0 +1,15 @@
+{
+  "dashboard": "डैशबोर्ड",
+  "rolePermission": "भूमिका और अनुमति",
+  "users": "उपयोगकर्ता",
+  "staff": "स्टाफ",
+  "provider": "प्रदाता",
+  "customer": "ग्राहक",
+  "all": "सभी",
+  "providers": "प्रदाता",
+  "queues": "कतारें",
+  "settings": "सेटिंग्स",
+  "myProfile": "मेरी प्रोफ़ाइल",
+  "billing": "बिलिंग",
+  "logOut": "लॉग आउट"
+}

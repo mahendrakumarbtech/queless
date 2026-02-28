@@ -1,33 +1,59 @@
 const Role = require('../models/Role');
-const permissionModules = require('../config/permissionModules');
+const Permission = require('../models/Permission');
+const RolePermission = require('../models/RolePermission');
+const { getPermissionNamesForRole, getPermissionsForRoles, syncRolePermissions } = require('../helpers/rolePermissions');
 
-// @desc    Get permission modules (for Role & Permission UI – Spatie-style grouped permissions)
+// @desc    Get permission modules from Permission table (for Role & Permission UI)
 // @route   GET /api/admin/roles/permission-modules
 // @access  Private (Admin)
+// Derive module and label from permission name (e.g. users.show -> module users, label "Users Show")
+function nameToModuleAndLabel(name) {
+  const parts = name.split('.');
+  const module = parts[0] || '';
+  const action = parts[1] || '';
+  const actionLabel = action.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const moduleLabel = module.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  return { module, label: `${moduleLabel} ${actionLabel}`.trim() };
+}
+
 exports.getPermissionModules = async (req, res) => {
   try {
-    res.json({
-      success: true,
-      data: permissionModules
+    const guard_name = req.query.guard_name || 'admin';
+    const permissions = await Permission.find({ guard_name }).sort({ name: 1 });
+    const byModule = {};
+    const moduleLabels = { users: 'Users', providers: 'Providers', queues: 'Queues', settings: 'Settings', roles: 'Roles', admin: 'Admin' };
+    permissions.forEach((p) => {
+      const { module, label } = nameToModuleAndLabel(p.name);
+      if (!byModule[module]) {
+        byModule[module] = { name: moduleLabels[module] || module, slug: module, permissions: [] };
+      }
+      byModule[module].permissions.push({ key: p.name, label });
     });
+    const data = Object.values(byModule);
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-// @desc    Get all roles
+// @desc    Get all roles (with permissions from role_has_permissions)
 // @route   GET /api/admin/roles
 // @access  Private (Admin)
 exports.getRoles = async (req, res) => {
   try {
-    const { isActive } = req.query;
-    const query = {};
+    const { isActive, guard_name } = req.query;
+    const query = { guard_name: guard_name || 'admin' };
 
     if (isActive !== undefined) {
       query.isActive = isActive === 'true';
     }
 
-    const roles = await Role.find(query).sort({ name: 1 });
+    const roles = await Role.find(query).sort({ name: 1 }).lean();
+    const roleIds = roles.map((r) => r._id);
+    const permMap = await getPermissionsForRoles(roleIds);
+    roles.forEach((r) => {
+      r.permissions = permMap.get(r._id.toString()) || [];
+    });
 
     res.json({
       success: true,
@@ -39,17 +65,18 @@ exports.getRoles = async (req, res) => {
   }
 };
 
-// @desc    Get single role
+// @desc    Get single role (with permissions from role_has_permissions)
 // @route   GET /api/admin/roles/:id
 // @access  Private (Admin)
 exports.getRole = async (req, res) => {
   try {
-    const role = await Role.findById(req.params.id);
+    const role = await Role.findById(req.params.id).lean();
 
     if (!role) {
       return res.status(404).json({ message: 'Role not found' });
     }
 
+    role.permissions = await getPermissionNamesForRole(role._id);
     res.json({
       success: true,
       data: role
@@ -70,23 +97,28 @@ exports.createRole = async (req, res) => {
       return res.status(400).json({ message: 'Role name is required' });
     }
 
-    const existingRole = await Role.findOne({ name: roleName });
+    const guard_name = req.body.guard_name || 'admin';
+    const existingRole = await Role.findOne({ name: roleName, guard_name });
     if (existingRole) {
-      return res.status(400).json({ message: 'Role already exists' });
+      return res.status(400).json({ message: 'Role already exists for this guard' });
     }
 
     const role = await Role.create({
       name: roleName,
+      guard_name,
       displayName: displayName || roleName,
       description: description || '',
-      permissions: Array.isArray(permissions) ? permissions : [],
       isActive: isActive !== false,
       isSystem: false
     });
 
+    await syncRolePermissions(role._id, Array.isArray(permissions) ? permissions : [], guard_name);
+
+    const data = role.toObject();
+    data.permissions = await getPermissionNamesForRole(role._id);
     res.status(201).json({
       success: true,
-      data: role
+      data
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -115,18 +147,19 @@ exports.updateRole = async (req, res) => {
       displayName: req.body.displayName !== undefined ? req.body.displayName : role.displayName,
       description: req.body.description !== undefined ? req.body.description : role.description,
       isActive: req.body.isActive !== undefined ? req.body.isActive : role.isActive,
-      permissions: Array.isArray(req.body.permissions) ? req.body.permissions : role.permissions,
       updatedAt: new Date()
     };
     if (req.body.name && !role.isSystem) {
       updateFields.name = req.body.name.toLowerCase().trim();
     }
-    const updatedRole = await Role.findByIdAndUpdate(
-      req.params.id,
-      updateFields,
-      { new: true, runValidators: true }
-    );
+    await Role.findByIdAndUpdate(req.params.id, updateFields, { runValidators: true });
 
+    if (Array.isArray(req.body.permissions)) {
+      await syncRolePermissions(role._id, req.body.permissions, role.guard_name || 'admin');
+    }
+
+    const updatedRole = await Role.findById(req.params.id).lean();
+    updatedRole.permissions = await getPermissionNamesForRole(role._id);
     res.json({
       success: true,
       data: updatedRole
@@ -164,6 +197,7 @@ exports.deleteRole = async (req, res) => {
       });
     }
 
+    await RolePermission.deleteMany({ roleId: req.params.id });
     await Role.findByIdAndDelete(req.params.id);
 
     res.json({

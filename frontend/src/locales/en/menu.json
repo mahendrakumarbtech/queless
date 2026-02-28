@@ -1,0 +1,15 @@
+{
+  "dashboard": "Dashboard",
+  "rolePermission": "Role & Permission",
+  "users": "Users",
+  "staff": "Staff",
+  "provider": "Provider",
+  "customer": "Customer",
+  "all": "All",
+  "providers": "Providers",
+  "queues": "Queues",
+  "settings": "Settings",
+  "myProfile": "My Profile",
+  "billing": "Billing",
+  "logOut": "Log Out"
+}

@@ -1,0 +1,7 @@
+{
+  "providers": "Providers",
+  "dashboard": "Dashboard",
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout"
+}

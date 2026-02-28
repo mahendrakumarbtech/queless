@@ -1,0 +1,28 @@
+{
+  "welcomeBack": "वापस स्वागत है, {{name}} 👋",
+  "subtitle": "आज आपके क्यू/कतार प्रबंधन सिस्टम में क्या हो रहा है, यह देखें।",
+  "stats": {
+    "totalUsers": "कुल उपयोगकर्ता",
+    "providers": "प्रदाता",
+    "activeQueues": "सक्रिय कतारें",
+    "completed": "पूर्ण",
+    "currentlyProcessing": "अभी प्रोसेस हो रहा है"
+  },
+  "trends": {
+    "thisMonth": "+12% इस महीने",
+    "new": "+5 नए",
+    "today": "+24% आज"
+  },
+  "sections": {
+    "recentUsers": "हाल के उपयोगकर्ता",
+    "providers": "प्रदाता"
+  },
+  "badges": {
+    "total": "{{count}} कुल"
+  },
+  "empty": {
+    "noUsers": "कोई उपयोगकर्ता नहीं मिला",
+    "noProviders": "कोई प्रदाता नहीं मिला"
+  }
+}
+
