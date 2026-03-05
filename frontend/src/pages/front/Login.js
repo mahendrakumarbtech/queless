@@ -32,7 +32,7 @@ const Login = () => {
               navigate('/admin');
               break;
             case 'provider':
-              navigate('/provider');
+              navigate('/');
               break;
             default:
               navigate('/customer');

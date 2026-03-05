@@ -60,13 +60,7 @@ const AdminLogin = () => {
           navigate('/admin');
           return;
         }
-        switch (role) {
-          case 'provider':
-            navigate('/provider');
-            break;
-          default:
-            navigate('/customer');
-        }
+        navigate('/customer');
       } else {
         navigate('/admin');
       }

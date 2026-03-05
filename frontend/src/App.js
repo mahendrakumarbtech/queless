@@ -13,7 +13,6 @@ import Home from './pages/front/Home';
 import Login from './pages/front/Login';
 import Register from './pages/front/Register';
 import CustomerDashboard from './pages/front/CustomerDashboard';
-import ProviderDashboard from './pages/front/ProviderDashboard';
 import StaffDashboard from './pages/front/StaffDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/Users';
@@ -24,7 +23,6 @@ import Roles from './pages/admin/Roles';
 import RoleForm from './pages/admin/RoleForm';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminForgotPassword from './pages/admin/AdminForgotPassword';
-import ProviderList from './pages/front/ProviderList';
 import BookQueue from './pages/front/BookQueue';
 
 const queryClient = new QueryClient();
@@ -134,20 +132,11 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/providers" element={<ProviderList />} />
               <Route
                 path="/customer"
                 element={
                   <PrivateRoute>
                     <CustomerDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/provider"
-                element={
-                  <PrivateRoute allowedRoles={['provider', 'admin']}>
-                    <ProviderDashboard />
                   </PrivateRoute>
                 }
               />

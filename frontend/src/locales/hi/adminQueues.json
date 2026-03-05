@@ -1,5 +1,6 @@
 {
   "title": "कतार प्रबंधन",
+  "searchPlaceholder": "कतार नंबर से खोजें...",
   "table": {
     "queueNo": "कतार #",
     "customer": "ग्राहक",

@@ -3,5 +3,16 @@
   "dashboard": "डैशबोर्ड",
   "login": "लॉग इन",
   "register": "रजिस्टर",
-  "logout": "लॉग आउट"
+  "logout": "लॉग आउट",
+  "searchPlaceholder": "खोजें (CTRL + K)",
+  "notifications": "सूचनाएं",
+  "notification": "सूचना",
+  "noNotifications": "कोई नई सूचना नहीं",
+  "viewAllNotifications": "सभी सूचनाएं देखें",
+  "switchToDark": "डार्क मोड",
+  "switchToLight": "लाइट मोड",
+  "themeMode": "थीम",
+  "light": "लाइट",
+  "dark": "डार्क",
+  "system": "सिस्टम"
 }

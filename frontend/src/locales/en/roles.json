@@ -7,6 +7,7 @@
   "description": "Description",
   "permissions": "Permissions",
   "subMenus": "Sub-menus",
+  "searchPlaceholder": "Search roles...",
   "selectAll": "Select All",
   "deselectAll": "Deselect All",
   "noRoles": "No roles found",

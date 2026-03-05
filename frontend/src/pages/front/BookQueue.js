@@ -21,7 +21,7 @@ const BookQueue = () => {
   const { data: provider } = useQuery(
     ['provider', providerId],
     async () => {
-      const response = await axios.get(`${API_URL}/provider/${providerId}`);
+      const response = await axios.get(`${API_URL}/providers/${providerId}`);
       return response.data.data;
     }
   );

@@ -38,8 +38,6 @@ const Navbar = () => {
       case 'admin':
       case 'staff':
         return '/admin';
-      case 'provider':
-        return '/provider';
       case 'customer':
         return '/customer';
       default:
@@ -54,9 +52,6 @@ const Navbar = () => {
           {websiteName}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <Button color="inherit" component={Link} to="/providers">
-            {t('nav:providers')}
-          </Button>
           {isAuthenticated ? (
             <>
               <Button color="inherit" component={Link} to={getDashboardLink()}>

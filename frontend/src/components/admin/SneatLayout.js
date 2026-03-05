@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { usePublicSettings } from '../../context/PublicSettingsContext';
-import getGreetingMessage from '../../utils/greetingHandler';
 import LanguageSwitcher from '../front/LanguageSwitcher';
 import { loadAdminThemeAsync, unloadAdminTheme } from './admin-theme-loader';
 import './SneatLayout.css';
@@ -26,8 +25,6 @@ const getMenuItems = (t) => [
       { text: t('menu:customer'), path: '/admin/users/customer' },
     ],
   },
-  { text: t('menu:providers'), icon: 'bx bx-building', path: '/admin/providers' },
-  { text: t('menu:queues'), icon: 'bx bx-list-ul', path: '/admin/queues' },
   { text: t('menu:settings'), icon: 'bx bx-cog', path: '/admin/settings' },
 ];
 
@@ -48,7 +45,19 @@ const SneatLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedMenuPath, setExpandedMenuPath] = useState(null);
   const [themeReady, setThemeReady] = useState(false);
+  const [themeMode, setThemeMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('admin-theme-mode');
+      if (stored === 'dark' || stored === 'light' || stored === 'system') return stored;
+      return 'system';
+    }
+    return 'system';
+  });
+  const [systemDark, setSystemDark] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
+  );
   const navigate = useNavigate();
+  const isDark = themeMode === 'dark' || (themeMode === 'system' && systemDark);
   const { user, logout } = useAuth();
   const { websiteName, sidebarLogoUrl } = usePublicSettings();
   const menuItems = getMenuItems(t);
@@ -68,6 +77,28 @@ const SneatLayout = ({ children }) => {
       unloadAdminTheme();
     };
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const apply = () => {
+      const effective = themeMode === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : themeMode;
+      root.setAttribute('data-bs-theme', effective);
+    };
+    apply();
+    if (typeof localStorage !== 'undefined') localStorage.setItem('admin-theme-mode', themeMode);
+    if (themeMode === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const onChange = () => {
+        apply();
+        setSystemDark(mq.matches);
+      };
+      setSystemDark(mq.matches);
+      mq.addEventListener('change', onChange);
+      return () => mq.removeEventListener('change', onChange);
+    }
+  }, [themeMode]);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -113,10 +144,15 @@ const SneatLayout = ({ children }) => {
               <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub' : ''} ${isMenuOpen(item) ? 'open' : ''}`}>
                 {item.children ? (
                   <>
-                    <a href="#"
+                    <a
+                      href={`#menu-${(item.path || item.text).replace(/\//g, '-')}`}
                       className="menu-link menu-toggle"
-                      onClick={() => setExpandedMenuPath((prev) => (prev === item.path ? null : item.path))}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExpandedMenuPath((prev) => (prev === item.path ? null : item.path));
+                      }}
                       aria-expanded={isMenuOpen(item)}
+                      role="button"
                     >
                       <i className={`menu-icon tf-icons ${item.icon}`}></i>
                       <div>{item.text}</div>
@@ -164,9 +200,95 @@ const SneatLayout = ({ children }) => {
               </button>
             </div>
 
-            <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-              {getGreetingMessage(user?.name?.split(' ')[0] || user?.name || 'Admin')}
+            <div className="navbar-nav-right d-flex align-items-center w-100" id="navbar-collapse">
+              {/* Search – commented out for now
+              <div className="navbar-search-wrapper navbar-search-wrapper-detached search-input-wrapper col-12 col-lg-5 col-xl-4 me-0 me-lg-4 flex-grow-1 admin-navbar-search">
+                <div className="input-group input-group-merge search-bar">
+                  <span className="input-group-text"><i className="bx bx-search"></i></span>
+                  <input
+                    type="text"
+                    className="form-control search-input"
+                    placeholder={t('nav:searchPlaceholder')}
+                    aria-label={t('nav:searchPlaceholder')}
+                  />
+                </div>
+              </div>
+              */}
               <ul className="navbar-nav flex-row align-items-center ms-auto">
+                <li className="nav-item dropdown dropdown-notifications">
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle hide-arrow position-relative"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label={t('nav:notifications')}
+                  >
+                    <i className="bx bx-bell bx-sm"></i>
+                    <span className="badge rounded-pill bg-danger badge-dot position-absolute border border-white top-0 end-0 mt-1 me-1"></span>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end py-0">
+                    <li className="dropdown-menu-header border-bottom d-flex align-items-center justify-content-between px-3 py-2">
+                      <span className="fw-semibold">{t('nav:notification')}</span>
+                      <span className="badge rounded-pill bg-label-primary">0</span>
+                    </li>
+                    <li className="dropdown-notifications-list scrollable-container">
+                      <ul className="list-group list-group-flush">
+                        <li className="list-group-item list-group-item-action dropdown-notifications-item py-3">
+                          <small className="text-muted">{t('nav:noNotifications')}</small>
+                        </li>
+                      </ul>
+                    </li>
+                    <li className="dropdown-menu-footer border-top">
+                      <button type="button" className="dropdown-item fw-medium py-2 text-center">
+                        {t('nav:viewAllNotifications')}
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+                <li className="nav-item dropdown">
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle hide-arrow"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label={t('nav:themeMode')}
+                    title={t('nav:themeMode')}
+                  >
+                    <i className={`bx bx-sm ${isDark ? 'bx-moon' : 'bx-sun'}`}></i>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end dropdown-menu-theme">
+                    <li>
+                      <button
+                        type="button"
+                        className={`dropdown-item ${themeMode === 'light' ? 'active' : ''}`}
+                        onClick={() => setThemeMode('light')}
+                      >
+                        <i className="bx bx-sun me-2"></i>
+                        <span>{t('nav:light')}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`dropdown-item ${themeMode === 'dark' ? 'active' : ''}`}
+                        onClick={() => setThemeMode('dark')}
+                      >
+                        <i className="bx bx-moon me-2"></i>
+                        <span>{t('nav:dark')}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`dropdown-item ${themeMode === 'system' ? 'active' : ''}`}
+                        onClick={() => setThemeMode('system')}
+                      >
+                        <i className="bx bx-desktop me-2"></i>
+                        <span>{t('nav:system')}</span>
+                      </button>
+                    </li>
+                  </ul>
+                </li>
                 <LanguageSwitcher />
                 <li className="nav-item navbar-dropdown dropdown-user dropdown">
                   <button

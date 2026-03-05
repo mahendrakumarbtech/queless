@@ -1,42 +1,56 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Form, InputGroup, Badge, Button } from 'react-bootstrap';
+import { Card, Row, Col, Badge, Button } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
+import AdminListToolbar from '../../components/admin/AdminListToolbar';
+import { downloadExportCsv } from '../../utils/exportCsv';
 
 const API_URL = config.API_URL;
 
 const Providers = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState('');
 
-  const { data: providers, isLoading } = useQuery('adminProviders', async () => {
-    const response = await axios.get(`${API_URL}/admin/providers`);
-    return response.data.data;
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    ...(search && { search: search.trim() }),
   });
 
-  const filteredProviders = providers?.filter(
-    (provider) =>
-      provider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      provider.providerType?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const { data, isLoading } = useQuery(
+    ['adminProviders', page, limit, search],
+    async () => {
+      const res = await axios.get(`${API_URL}/admin/providers?${queryParams}`);
+      return res.data;
+    }
+  );
+
+  const providers = data?.data || [];
+  const pagination = data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 };
+
+  const handleExport = () => {
+    const exportParams = new URLSearchParams({
+      export: 'csv',
+      ...(search && { search: search.trim() }),
+    });
+    downloadExportCsv(`${API_URL}/admin/providers?${exportParams}`, 'providers.csv');
+  };
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">{t('adminProviders:title')}</h4>
-        <InputGroup style={{ width: '300px' }}>
-          <InputGroup.Text>
-            <i className="bi bi-search"></i>
-          </InputGroup.Text>
-          <Form.Control
-            placeholder={t('adminProviders:searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </InputGroup>
-      </div>
+      <AdminListToolbar
+        title={t('adminProviders:title')}
+        search={search}
+        onSearchChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        searchPlaceholder={t('adminProviders:searchPlaceholder')}
+        onExport={handleExport}
+        pagination={pagination}
+        onPageChange={setPage}
+      />
 
       {isLoading ? (
         <div className="text-center py-5">
@@ -46,7 +60,7 @@ const Providers = () => {
         </div>
       ) : (
         <Row>
-          {filteredProviders.length === 0 ? (
+          {providers.length === 0 ? (
             <Col xs={12}>
               <Card>
                 <Card.Body>
@@ -55,7 +69,7 @@ const Providers = () => {
               </Card>
             </Col>
           ) : (
-            filteredProviders.map((provider) => (
+            providers.map((provider) => (
               <Col xs={12} sm={6} md={4} key={provider._id} className="mb-4">
                 <Card className="h-100">
                   <Card.Body>

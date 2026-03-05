@@ -1,5 +1,6 @@
 {
   "title": "Queue Management",
+  "searchPlaceholder": "Search by queue number...",
   "table": {
     "queueNo": "Queue #",
     "customer": "Customer",

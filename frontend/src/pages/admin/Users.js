@@ -1,86 +1,80 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, Table, Form, InputGroup, Badge, Button } from 'react-bootstrap';
+import { Card, Table, Badge, Button } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
+import AdminListToolbar from '../../components/admin/AdminListToolbar';
+import { downloadExportCsv } from '../../utils/exportCsv';
 
 const API_URL = config.API_URL;
 
 const Users = () => {
   const { t } = useTranslation();
-  const { roleFilter } = useParams(); // staff | provider | customer from path /admin/users/:roleFilter
-  const [searchTerm, setSearchTerm] = useState('');
+  const { roleFilter } = useParams();
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState('');
 
-  const { data: users, isLoading } = useQuery('adminUsers', async () => {
-    const response = await axios.get(`${API_URL}/admin/users`);
-    return response.data.data;
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    ...(search && { search: search.trim() }),
+    ...(roleFilter && ['staff', 'provider', 'customer'].includes(roleFilter) && { role: roleFilter }),
   });
 
-  // Normalize users - ensure role is always a string
-  let normalizedUsers = users?.map(user => ({
-    ...user,
-    role: typeof user.role === 'string'
-      ? user.role
-      : (user.role?.name || 'customer')
-  })) || [];
-
-  if (roleFilter && ['staff', 'provider', 'customer'].includes(roleFilter)) {
-    normalizedUsers = normalizedUsers.filter((u) => u.role === roleFilter);
-  }
-
-  const filteredUsers = normalizedUsers.filter(
-    (user) =>
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const { data, isLoading } = useQuery(
+    ['adminUsers', page, limit, search, roleFilter],
+    async () => {
+      const res = await axios.get(`${API_URL}/admin/users?${queryParams}`);
+      return res.data;
+    }
   );
+
+  const users = data?.data || [];
+  const pagination = data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 };
+
+  const handleExport = () => {
+    const exportParams = new URLSearchParams({
+      export: 'csv',
+      ...(search && { search: search.trim() }),
+      ...(roleFilter && ['staff', 'provider', 'customer'].includes(roleFilter) && { role: roleFilter }),
+    });
+    downloadExportCsv(`${API_URL}/admin/users?${exportParams}`, 'users.csv');
+  };
 
   const getRoleColor = (role) => {
     switch (role) {
-      case 'admin':
-        return 'danger';
-      case 'provider':
-        return 'primary';
-      case 'staff':
-        return 'warning';
-      case 'provider_staff':
-        return 'info';
-      case 'customer':
-        return 'secondary';
-      default:
-        return 'secondary';
+      case 'admin': return 'danger';
+      case 'provider': return 'primary';
+      case 'staff': return 'warning';
+      case 'provider_staff': return 'info';
+      case 'customer': return 'secondary';
+      default: return 'secondary';
     }
   };
 
   const roleLabel =
-    roleFilter === 'staff'
-      ? t('menu:staff')
-      : roleFilter === 'provider'
-        ? t('menu:provider')
-        : roleFilter === 'customer'
-          ? t('menu:customer')
-          : '';
+    roleFilter === 'staff' ? t('menu:staff')
+      : roleFilter === 'provider' ? t('menu:provider')
+      : roleFilter === 'customer' ? t('menu:customer') : '';
+
+  const title = roleFilter
+    ? t('adminUsers:titles.filtered', { role: roleLabel })
+    : t('adminUsers:titles.management');
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">
-          {roleFilter
-            ? t('adminUsers:titles.filtered', { role: roleLabel })
-            : t('adminUsers:titles.management')}
-        </h4>
-        <InputGroup style={{ width: '300px' }}>
-          <InputGroup.Text>
-            <i className="bi bi-search"></i>
-          </InputGroup.Text>
-          <Form.Control
-            placeholder={t('adminUsers:searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </InputGroup>
-      </div>
+      <AdminListToolbar
+        title={title}
+        search={search}
+        onSearchChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        searchPlaceholder={t('adminUsers:searchPlaceholder')}
+        onExport={handleExport}
+        pagination={pagination}
+        onPageChange={setPage}
+      />
 
       <Card>
         <Card.Body>
@@ -103,14 +97,14 @@ const Users = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.length === 0 ? (
+                  {users.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-4">
                         {t('adminUsers:empty.noUsers')}
                       </td>
                     </tr>
                   ) : (
-                    filteredUsers.map((user) => (
+                    users.map((user) => (
                       <tr key={user._id}>
                         <td>
                           <div className="d-flex align-items-center">
@@ -126,9 +120,7 @@ const Users = () => {
                         </td>
                         <td>{user.email}</td>
                         <td>
-                          <Badge bg={getRoleColor(user.role)}>
-                            {user.role}
-                          </Badge>
+                          <Badge bg={getRoleColor(user.role)}>{user.role}</Badge>
                         </td>
                         <td>
                           <Badge bg={user.isActive ? 'success' : 'secondary'}>

@@ -3,5 +3,16 @@
   "dashboard": "Dashboard",
   "login": "Login",
   "register": "Register",
-  "logout": "Logout"
+  "logout": "Logout",
+  "searchPlaceholder": "Search (CTRL + K)",
+  "notifications": "Notifications",
+  "notification": "Notification",
+  "noNotifications": "No new notifications",
+  "viewAllNotifications": "View all notifications",
+  "switchToDark": "Dark mode",
+  "switchToLight": "Light mode",
+  "themeMode": "Theme",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System"
 }

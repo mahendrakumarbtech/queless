@@ -70,7 +70,7 @@ const CustomerDashboard = () => {
         <Button
           variant="contained"
           component={Link}
-          to="/providers"
+          to="/"
           sx={{ mb: 2 }}
         >
           Book New Queue

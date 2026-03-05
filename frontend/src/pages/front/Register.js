@@ -37,16 +37,11 @@ const Register = () => {
       const role = formData.role;
       switch (role) {
         case 'admin':
+        case 'staff':
           navigate('/admin');
           break;
-        case 'provider':
-          navigate('/provider');
-          break;
-        case 'staff':
-          navigate('/staff');
-          break;
         default:
-          navigate('/customer');
+          navigate('/');
       }
     } else {
       setError(result.message);

@@ -27,7 +27,6 @@ mongoose.connect(config.MONGODB_URI, {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api', require('./routes/publicRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/provider', require('./routes/providerRoutes'));
 app.use('/api/customer', require('./routes/customerRoutes'));
 app.use('/api/staff', require('./routes/staffRoutes'));
 app.use('/api/queue', require('./routes/queueRoutes'));

@@ -4,17 +4,17 @@ const Queue = require('../models/Queue');
 const Settings = require('../models/Settings');
 const Role = require('../models/Role');
 const ModelHasRole = require('../models/ModelHasRole');
+const { getPaginationParams, paginatedResponse, toCSV, sendCSV } = require('../helpers/listHelpers');
 
-// @desc    Get all users
+// @desc    Get all users (with filter, pagination, export)
 // @route   GET /api/admin/users
 // @access  Private (Admin)
 exports.getUsers = async (req, res) => {
   try {
-    const { role, isActive } = req.query;
+    const { role, isActive, search, export: exportFormat } = req.query;
     const query = {};
 
     if (role) {
-      // Support both role name and role ID
       const roleDoc = await Role.findOne({
         $or: [{ name: role }, { _id: role }]
       });
@@ -23,14 +23,47 @@ exports.getUsers = async (req, res) => {
       }
     }
     if (isActive !== undefined) query.isActive = isActive === 'true';
+    if (search && search.trim()) {
+      const re = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      query.$or = [
+        { name: re },
+        { email: re },
+      ];
+    }
 
-    const users = await User.find(query)
+    const total = await User.countDocuments(query);
+    let users;
+
+    if (exportFormat === 'csv') {
+      users = await User.find(query)
+        .populate('role', 'name displayName')
+        .select('-password')
+        .sort({ createdAt: -1 })
+        .limit(5000)
+        .lean();
+      const normalized = users.map((u) => ({
+        ...u,
+        role: u.role?.name || u.roleName || 'customer'
+      }));
+      const csv = toCSV(normalized, [
+        { key: 'name', label: 'Name' },
+        { key: 'email', label: 'Email' },
+        { key: 'role', label: 'Role' },
+        { key: 'isActive', label: 'Active' },
+        { key: 'createdAt', label: 'Created At' },
+      ]);
+      return sendCSV(res, csv, 'users.csv');
+    }
+
+    const { page, limit, skip } = getPaginationParams(req.query);
+    users = await User.find(query)
       .populate('providerId')
       .populate('role', 'name displayName guard_name')
       .select('-password')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    // Normalize users - convert role object to role name string for frontend
     const normalizedUsers = users.map(user => {
       const userObj = user.toObject();
       return {
@@ -39,11 +72,7 @@ exports.getUsers = async (req, res) => {
       };
     });
 
-    res.json({
-      success: true,
-      count: normalizedUsers.length,
-      data: normalizedUsers
-    });
+    res.json(paginatedResponse(normalizedUsers, total, page, limit));
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -82,31 +111,80 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// @desc    Get all providers
+// @desc    Get all providers (with filter, pagination, export)
 // @route   GET /api/admin/providers
 // @access  Private (Admin)
 exports.getProviders = async (req, res) => {
   try {
-    const providers = await Provider.find()
+    const { search, export: exportFormat } = req.query;
+    const query = {};
+
+    if (search && search.trim()) {
+      const re = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      query.$or = [
+        { name: re },
+        { providerType: re },
+      ];
+    }
+
+    const total = await Provider.countDocuments(query);
+
+    if (exportFormat === 'csv') {
+      const providers = await Provider.find(query)
+        .populate('owner', 'name email phone')
+        .sort({ createdAt: -1 })
+        .limit(5000)
+        .lean();
+      const csv = toCSV(providers, [
+        { key: 'name', label: 'Name' },
+        { key: 'providerType', label: 'Type' },
+        { key: 'isActive', label: 'Active' },
+        { key: 'createdAt', label: 'Created At' },
+      ]);
+      return sendCSV(res, csv, 'providers.csv');
+    }
+
+    const { page, limit, skip } = getPaginationParams(req.query);
+    const providers = await Provider.find(query)
       .populate('owner', 'name email phone')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json(paginatedResponse(providers, total, page, limit));
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Get single provider (for public booking page)
+// @route   GET /api/providers/:id
+// @access  Public
+exports.getProviderById = async (req, res) => {
+  try {
+    const provider = await Provider.findById(req.params.id)
+      .populate('owner', 'name email phone')
+      .select('-__v');
+
+    if (!provider || !provider.isActive) {
+      return res.status(404).json({ message: 'Provider not found' });
+    }
 
     res.json({
       success: true,
-      count: providers.length,
-      data: providers
+      data: provider
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-// @desc    Get all queues
+// @desc    Get all queues (with filter, pagination, export)
 // @route   GET /api/admin/queues
 // @access  Private (Admin)
 exports.getQueues = async (req, res) => {
   try {
-    const { providerId, status, date } = req.query;
+    const { providerId, status, date, search, export: exportFormat } = req.query;
     const query = {};
 
     if (providerId) query.providerId = providerId;
@@ -118,18 +196,48 @@ exports.getQueues = async (req, res) => {
       endDate.setHours(23, 59, 59, 999);
       query.date = { $gte: startDate, $lte: endDate };
     }
+    if (search && search.trim()) {
+      const num = parseInt(search.trim(), 10);
+      if (!isNaN(num)) {
+        query.queueNumber = num;
+      }
+    }
 
+    const total = await Queue.countDocuments(query);
+
+    if (exportFormat === 'csv') {
+      const queues = await Queue.find(query)
+        .populate('providerId', 'name providerType')
+        .populate('customerId', 'name email phone')
+        .sort({ createdAt: -1 })
+        .limit(5000)
+        .lean();
+      const rows = queues.map((q) => ({
+        queueNumber: q.queueNumber,
+        customer: q.customerId?.name || '',
+        provider: q.providerId?.name || '',
+        date: q.date,
+        status: q.status,
+      }));
+      const csv = toCSV(rows, [
+        { key: 'queueNumber', label: 'Queue No' },
+        { key: 'customer', label: 'Customer' },
+        { key: 'provider', label: 'Provider' },
+        { key: 'date', label: 'Date' },
+        { key: 'status', label: 'Status' },
+      ]);
+      return sendCSV(res, csv, 'queues.csv');
+    }
+
+    const { page, limit, skip } = getPaginationParams(req.query);
     const queues = await Queue.find(query)
       .populate('providerId', 'name providerType')
       .populate('customerId', 'name email phone')
       .sort({ createdAt: -1 })
-      .limit(100);
+      .skip(skip)
+      .limit(limit);
 
-    res.json({
-      success: true,
-      count: queues.length,
-      data: queues
-    });
+    res.json(paginatedResponse(queues, total, page, limit));
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

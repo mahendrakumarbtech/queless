@@ -5,6 +5,8 @@ import { Card, Table, Badge, Button } from 'react-bootstrap';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
 import config from '../../config/config';
+import AdminListToolbar from '../../components/admin/AdminListToolbar';
+import { downloadExportCsv } from '../../utils/exportCsv';
 
 const API_URL = config.API_URL;
 
@@ -13,12 +15,26 @@ const Roles = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState('');
 
-  const { data: rolesData, isLoading } = useQuery('adminRoles', async () => {
-    const res = await axios.get(`${API_URL}/admin/roles`);
-    return res.data;
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    ...(search && { search: search.trim() }),
   });
-  const roles = rolesData?.data || [];
+
+  const { data, isLoading } = useQuery(
+    ['adminRoles', page, limit, search],
+    async () => {
+      const res = await axios.get(`${API_URL}/admin/roles?${queryParams}`);
+      return res.data;
+    }
+  );
+
+  const roles = data?.data || [];
+  const pagination = data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 };
 
   const deleteMutation = useMutation(
     (id) => axios.delete(`${API_URL}/admin/roles/${id}`),
@@ -44,18 +60,32 @@ const Roles = () => {
     deleteMutation.mutate(role._id);
   };
 
+  const handleExport = () => {
+    const exportParams = new URLSearchParams({
+      export: 'csv',
+      ...(search && { search: search.trim() }),
+    });
+    downloadExportCsv(`${API_URL}/admin/roles?${exportParams}`, 'roles.csv');
+  };
+
+  const createButton = (
+    <Button variant="primary" as={Link} to="/admin/roles/create">
+      <i className="bx bx-plus me-1"></i> {t('roles:createRole')}
+    </Button>
+  );
+
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">{t('roles:title')}</h4>
-        <Button
-          variant="primary"
-          as={Link}
-          to="/admin/roles/create"
-        >
-          <i className="bx bx-plus me-1"></i> {t('roles:createRole')}
-        </Button>
-      </div>
+      <AdminListToolbar
+        title={t('roles:title')}
+        search={search}
+        onSearchChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        searchPlaceholder={t('roles:searchPlaceholder')}
+        onExport={handleExport}
+        pagination={pagination}
+        onPageChange={setPage}
+        extra={createButton}
+      />
 
       <Card>
         <Card.Body>
@@ -68,8 +98,8 @@ const Roles = () => {
           ) : (
             <div className="table-responsive">
               <Table hover>
-<thead>
-                <tr>
+                <thead>
+                  <tr>
                     <th>{t('roles:roleName')}</th>
                     <th>{t('roles:displayName')}</th>
                     <th>{t('roles:description')}</th>

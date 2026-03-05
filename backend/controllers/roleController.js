@@ -2,6 +2,7 @@ const Role = require('../models/Role');
 const Permission = require('../models/Permission');
 const RolePermission = require('../models/RolePermission');
 const { getPermissionNamesForRole, getPermissionsForRoles, syncRolePermissions } = require('../helpers/rolePermissions');
+const { getPaginationParams, paginatedResponse, toCSV, sendCSV } = require('../helpers/listHelpers');
 
 // @desc    Get permission modules from Permission table (for Role & Permission UI)
 // @route   GET /api/admin/roles/permission-modules
@@ -36,30 +37,53 @@ exports.getPermissionModules = async (req, res) => {
   }
 };
 
-// @desc    Get all roles (with permissions from role_has_permissions)
+// @desc    Get all roles (with filter, pagination, export)
 // @route   GET /api/admin/roles
 // @access  Private (Admin)
 exports.getRoles = async (req, res) => {
   try {
-    const { isActive, guard_name } = req.query;
+    const { isActive, guard_name, search, export: exportFormat } = req.query;
     const query = { guard_name: guard_name || 'admin' };
 
     if (isActive !== undefined) {
       query.isActive = isActive === 'true';
     }
+    if (search && search.trim()) {
+      const re = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      query.$or = [
+        { name: re },
+        { displayName: re },
+      ];
+    }
 
-    const roles = await Role.find(query).sort({ name: 1 }).lean();
+    const total = await Role.countDocuments(query);
+
+    if (exportFormat === 'csv') {
+      const roles = await Role.find(query).sort({ name: 1 }).limit(5000).lean();
+      const rows = roles.map((r) => ({
+        name: r.name,
+        displayName: r.displayName,
+        isActive: r.isActive,
+        isSystem: r.isSystem,
+      }));
+      const csv = toCSV(rows, [
+        { key: 'name', label: 'Name' },
+        { key: 'displayName', label: 'Display Name' },
+        { key: 'isActive', label: 'Active' },
+        { key: 'isSystem', label: 'System' },
+      ]);
+      return sendCSV(res, csv, 'roles.csv');
+    }
+
+    const { page, limit, skip } = getPaginationParams(req.query);
+    const roles = await Role.find(query).sort({ name: 1 }).skip(skip).limit(limit).lean();
     const roleIds = roles.map((r) => r._id);
     const permMap = await getPermissionsForRoles(roleIds);
     roles.forEach((r) => {
       r.permissions = permMap.get(r._id.toString()) || [];
     });
 
-    res.json({
-      success: true,
-      count: roles.length,
-      data: roles
-    });
+    res.json(paginatedResponse(roles, total, page, limit));
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
