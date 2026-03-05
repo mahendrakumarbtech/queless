@@ -6,15 +6,15 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import { AuthProvider } from './context/AuthContext';
 import { PublicSettingsProvider, usePublicSettings } from './context/PublicSettingsContext';
-import PrivateRoute from './components/PrivateRoute';
-import Navbar from './components/Navbar';
+import PrivateRoute from './components/front/PrivateRoute';
+import Navbar from './components/front/Navbar';
 import SneatLayout from './components/admin/SneatLayout';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import CustomerDashboard from './pages/CustomerDashboard';
-import ProviderDashboard from './pages/ProviderDashboard';
-import StaffDashboard from './pages/StaffDashboard';
+import Home from './pages/front/Home';
+import Login from './pages/front/Login';
+import Register from './pages/front/Register';
+import CustomerDashboard from './pages/front/CustomerDashboard';
+import ProviderDashboard from './pages/front/ProviderDashboard';
+import StaffDashboard from './pages/front/StaffDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/Users';
 import AdminProviders from './pages/admin/Providers';
@@ -24,8 +24,8 @@ import Roles from './pages/admin/Roles';
 import RoleForm from './pages/admin/RoleForm';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminForgotPassword from './pages/admin/AdminForgotPassword';
-import ProviderList from './pages/ProviderList';
-import BookQueue from './pages/BookQueue';
+import ProviderList from './pages/front/ProviderList';
+import BookQueue from './pages/front/BookQueue';
 
 const queryClient = new QueryClient();
 

@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-query';
 import axios from 'axios';
 import moment from 'moment';
-import config from '../config/config';
+import config from '../../config/config';
 
 const API_URL = config.API_URL;
 

@@ -3,8 +3,8 @@ import { Container, Typography, Card, CardContent, Grid, Button } from '@mui/mat
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import config from '../config/config';
+import { useAuth } from '../../context/AuthContext';
+import config from '../../config/config';
 
 const API_URL = config.API_URL;
 

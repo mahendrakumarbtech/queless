@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Card, CardContent, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material';
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
-import config from '../config/config';
+import config from '../../config/config';
 
 const API_URL = config.API_URL;
 

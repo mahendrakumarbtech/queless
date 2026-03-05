@@ -6,6 +6,7 @@
   "displayName": "Display Name",
   "description": "Description",
   "permissions": "Permissions",
+  "subMenus": "Sub-menus",
   "selectAll": "Select All",
   "deselectAll": "Deselect All",
   "noRoles": "No roles found",

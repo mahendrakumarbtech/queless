@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
-import { usePublicSettings } from '../context/PublicSettingsContext';
+import { useAuth } from '../../context/AuthContext';
+import { usePublicSettings } from '../../context/PublicSettingsContext';
 
 const Navbar = () => {
   const { t } = useTranslation();

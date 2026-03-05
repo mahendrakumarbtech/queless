@@ -1,8 +1,8 @@
 import React from 'react';
 import { Container, Typography, Box, Grid, Card, CardContent, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { usePublicSettings } from '../context/PublicSettingsContext';
+import { useAuth } from '../../context/AuthContext';
+import { usePublicSettings } from '../../context/PublicSettingsContext';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();

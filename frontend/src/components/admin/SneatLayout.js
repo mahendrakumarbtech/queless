@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { usePublicSettings } from '../../context/PublicSettingsContext';
 import getGreetingMessage from '../../utils/greetingHandler';
-import LanguageSwitcher from '../LanguageSwitcher';
+import LanguageSwitcher from '../front/LanguageSwitcher';
 import { loadAdminThemeAsync, unloadAdminTheme } from './admin-theme-loader';
 import './SneatLayout.css';
 
@@ -113,22 +113,15 @@ const SneatLayout = ({ children }) => {
               <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub' : ''} ${isMenuOpen(item) ? 'open' : ''}`}>
                 {item.children ? (
                   <>
-                    <button
-                      type="button"
+                    <a href="#"
                       className="menu-link menu-toggle"
                       onClick={() => setExpandedMenuPath((prev) => (prev === item.path ? null : item.path))}
                       aria-expanded={isMenuOpen(item)}
                     >
                       <i className={`menu-icon tf-icons ${item.icon}`}></i>
                       <div>{item.text}</div>
-                      <i className="menu-arrow tf-icons bx bx-chevron-down"></i>
-                    </button>
+                    </a>
                     <ul className="menu-sub">
-                      <li className="menu-item">
-                        <NavLink to={item.path} className="menu-link" onClick={closeSidebar}>
-                          <div>{t('menu:all')}</div>
-                        </NavLink>
-                      </li>
                       {item.children.map((sub) => (
                         <li key={sub.path} className="menu-item">
                           <NavLink to={sub.path} className="menu-link" onClick={closeSidebar}>

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Container, Typography, Card, CardContent, Grid, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import moment from 'moment';
-import config from '../config/config';
+import config from '../../config/config';
 
 const API_URL = config.API_URL;
 

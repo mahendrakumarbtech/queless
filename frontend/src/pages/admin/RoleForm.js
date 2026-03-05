@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, Form, Button } from 'react-bootstrap';
+import { Card, Form, Button, Accordion } from 'react-bootstrap';
 import axios from 'axios';
 import config from '../../config/config';
 
 const API_URL = config.API_URL;
+
+// Permission sections in main menu order (accordion headers). Sub-menus shown inside accordion body.
+const MENU_SECTIONS = [
+  { slug: 'admin', menuKey: 'dashboard' },
+  { slug: 'roles', menuKey: 'rolePermission' },
+  { slug: 'users', menuKey: 'users', subMenuKeys: ['staff', 'provider', 'customer'] },
+  { slug: 'providers', menuKey: 'providers' },
+  { slug: 'queues', menuKey: 'queues' },
+  { slug: 'settings', menuKey: 'settings' },
+];
 
 const RoleForm = () => {
   const { t } = useTranslation();
@@ -114,6 +124,13 @@ const RoleForm = () => {
     );
   }
 
+  const moduleBySlug = modules.reduce((acc, m) => { acc[m.slug] = m; return acc; }, {});
+  const orderedSections = MENU_SECTIONS.filter((s) => moduleBySlug[s.slug]).map((s) => ({
+    ...s,
+    name: t(`menu:${s.menuKey}`),
+    module: moduleBySlug[s.slug],
+  }));
+
   const allKeys = modules.flatMap((m) => m.permissions.map((p) => p.key));
   const allSelected = allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
 
@@ -191,15 +208,16 @@ const RoleForm = () => {
             </Button>
           </Card.Header>
           <Card.Body>
-            <div className="row">
-              {modules.map((mod) => {
+            <Accordion defaultActiveKey={orderedSections[0]?.slug}>
+              {orderedSections.map((section) => {
+                const mod = section.module;
                 const keys = mod.permissions.map((p) => p.key);
-                const moduleAllSelected = keys.every((k) => permissions.includes(k));
+                const moduleAllSelected = keys.length > 0 && keys.every((k) => permissions.includes(k));
                 return (
-                  <div key={mod.slug} className="col-md-6 col-xl-4 mb-4">
-                    <Card className="border shadow-sm">
-                      <Card.Header className="py-2 d-flex justify-content-between align-items-center">
-                        <span className="fw-medium">{mod.name}</span>
+                  <Accordion.Item key={section.slug} eventKey={section.slug}>
+                    <Accordion.Header>{section.name}</Accordion.Header>
+                    <Accordion.Body>
+                      <div className="d-flex justify-content-end mb-3">
                         <Button
                           type="button"
                           variant="outline-primary"
@@ -208,24 +226,32 @@ const RoleForm = () => {
                         >
                           {moduleAllSelected ? t('roles:deselectAll') : t('roles:selectAll')}
                         </Button>
-                      </Card.Header>
-                      <Card.Body className="py-2">
-                        {mod.permissions.map((perm) => (
-                          <div key={perm.key} className="d-flex justify-content-between align-items-center mb-2">
-                            <Form.Label className="mb-0 fw-normal">{perm.label}</Form.Label>
-                            <Form.Check
-                              type="switch"
-                              checked={permissions.includes(perm.key)}
-                              onChange={() => togglePermission(perm.key)}
-                            />
-                          </div>
-                        ))}
-                      </Card.Body>
-                    </Card>
-                  </div>
+                      </div>
+                      {section.subMenuKeys && section.subMenuKeys.length > 0 && (
+                        <div className="mb-3 pb-2 border-bottom">
+                          <span className="text-muted small me-2">{t('roles:subMenus')}:</span>
+                          {section.subMenuKeys.map((key) => (
+                            <span key={key} className="badge bg-label-secondary me-1">
+                              {t(`menu:${key}`)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {mod.permissions.map((perm) => (
+                        <div key={perm.key} className="d-flex justify-content-between align-items-center mb-2">
+                          <Form.Label className="mb-0 fw-normal">{perm.label}</Form.Label>
+                          <Form.Check
+                            type="switch"
+                            checked={permissions.includes(perm.key)}
+                            onChange={() => togglePermission(perm.key)}
+                          />
+                        </div>
+                      ))}
+                    </Accordion.Body>
+                  </Accordion.Item>
                 );
               })}
-            </div>
+            </Accordion>
           </Card.Body>
         </Card>
 
