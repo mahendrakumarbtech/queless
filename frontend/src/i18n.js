@@ -17,6 +17,7 @@ import enAdminProviders from './locales/en/adminProviders.json';
 import enAdminQueues from './locales/en/adminQueues.json';
 import enAdminSettings from './locales/en/adminSettings.json';
 import enAdminAuth from './locales/en/adminAuth.json';
+import enHome from './locales/en/home.json';
 
 import hiCommon from './locales/hi/common.json';
 import hiMenu from './locales/hi/menu.json';
@@ -30,6 +31,7 @@ import hiAdminProviders from './locales/hi/adminProviders.json';
 import hiAdminQueues from './locales/hi/adminQueues.json';
 import hiAdminSettings from './locales/hi/adminSettings.json';
 import hiAdminAuth from './locales/hi/adminAuth.json';
+import hiHome from './locales/hi/home.json';
 
 const resources = {
   en: {
@@ -45,6 +47,7 @@ const resources = {
     adminQueues: enAdminQueues,
     adminSettings: enAdminSettings,
     adminAuth: enAdminAuth,
+    home: enHome,
   },
   hi: {
     common: hiCommon,
@@ -59,6 +62,7 @@ const resources = {
     adminQueues: hiAdminQueues,
     adminSettings: hiAdminSettings,
     adminAuth: hiAdminAuth,
+    home: hiHome,
   },
 };
 
@@ -82,6 +86,7 @@ i18n.use(initReactI18next).init({
     'adminQueues',
     'adminSettings',
     'adminAuth',
+    'home',
   ],
   interpolation: {
     escapeValue: false,

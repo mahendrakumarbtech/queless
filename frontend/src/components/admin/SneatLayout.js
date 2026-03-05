@@ -58,7 +58,7 @@ const SneatLayout = ({ children }) => {
   );
   const navigate = useNavigate();
   const isDark = themeMode === 'dark' || (themeMode === 'system' && systemDark);
-  const { user, logout } = useAuth();
+  const { adminUser, logoutAdmin } = useAuth();
   const { websiteName, sidebarLogoUrl } = usePublicSettings();
   const menuItems = getMenuItems(t);
 
@@ -102,7 +102,7 @@ const SneatLayout = ({ children }) => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    logout();
+    logoutAdmin();
     navigate('/admin/login');
   };
 
@@ -299,7 +299,7 @@ const SneatLayout = ({ children }) => {
                   >
                     <div className="avatar avatar-online">
                       <span className="avatar-initial rounded-circle bg-label-primary">
-                        {user?.name?.charAt(0).toUpperCase() || 'A'}
+                        {adminUser?.name?.charAt(0).toUpperCase() || 'A'}
                       </span>
                     </div>
                   </button>
@@ -310,12 +310,12 @@ const SneatLayout = ({ children }) => {
                           <div className="flex-shrink-0 me-3">
                             <div className="avatar avatar-online">
                               <span className="avatar-initial rounded-circle bg-label-primary">
-                                {user?.name?.charAt(0).toUpperCase() || 'A'}
+                                {adminUser?.name?.charAt(0).toUpperCase() || 'A'}
                               </span>
                             </div>
                           </div>
                           <div className="flex-grow-1">
-                            <span className="fw-medium d-block">{user?.name || 'Admin'}</span>
+                            <span className="fw-medium d-block">{adminUser?.name || 'Admin'}</span>
                             <small className="text-muted">{t('common:admin')}</small>
                           </div>
                         </div>

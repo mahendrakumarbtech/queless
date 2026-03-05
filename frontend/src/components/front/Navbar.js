@@ -8,7 +8,7 @@ import { usePublicSettings } from '../../context/PublicSettingsContext';
 
 const Navbar = () => {
   const { t } = useTranslation();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { websiteName } = usePublicSettings();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -27,23 +27,17 @@ const Navbar = () => {
     handleClose();
   };
 
+  const userRole = user ? (typeof user.role === 'string' ? user.role : (user.role?.name || 'customer')) : null;
+  const isFrontUser = userRole === 'provider' || userRole === 'customer';
+
   const getDashboardLink = () => {
-    if (!user) return '/';
-    // Get role as string (handle both string and object)
-    const userRole = typeof user.role === 'string' 
-      ? user.role 
-      : (user.role?.name || 'customer');
-    
-    switch (userRole) {
-      case 'admin':
-      case 'staff':
-        return '/admin';
-      case 'customer':
-        return '/customer';
-      default:
-        return '/';
-    }
+    if (!isFrontUser) return null;
+    if (userRole === 'customer') return '/customer';
+    if (userRole === 'provider') return '/staff';
+    return null;
   };
+
+  const dashboardLink = getDashboardLink();
 
   return (
     <AppBar position="static">
@@ -52,11 +46,13 @@ const Navbar = () => {
           {websiteName}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {isAuthenticated ? (
+          {isFrontUser ? (
             <>
-              <Button color="inherit" component={Link} to={getDashboardLink()}>
-                {t('nav:dashboard')}
-              </Button>
+              {dashboardLink && (
+                <Button color="inherit" component={Link} to={dashboardLink}>
+                  {t('nav:dashboard')}
+                </Button>
+              )}
               <IconButton
                 size="large"
                 aria-label="account of current user"

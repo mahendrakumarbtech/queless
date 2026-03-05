@@ -12,24 +12,18 @@ const AdminLogin = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, user, isAuthenticated, loading: authLoading } = useAuth();
+  const { loginAdmin, adminUser, isAdminAuthenticated, loading: authLoading } = useAuth();
   const { websiteName } = usePublicSettings();
   const navigate = useNavigate();
 
-  // If already logged in as admin or staff (admin panel roles), go to admin dashboard
-  const isAdminPanelRole = (r) => r === 'admin' || r === 'staff';
   useEffect(() => {
     if (authLoading) return;
-    if (isAuthenticated && user) {
-      const role = typeof user.role === 'string' ? user.role : (user.role?.name || '');
-      if (isAdminPanelRole(role)) {
-        navigate('/admin', { replace: true });
-      }
+    if (isAdminAuthenticated && adminUser) {
+      navigate('/admin', { replace: true });
     }
-  }, [isAuthenticated, user, authLoading, navigate]);
+  }, [isAdminAuthenticated, adminUser, authLoading, navigate]);
 
-  const role = user ? (typeof user.role === 'string' ? user.role : (user.role?.name || '')) : '';
-  if (authLoading || (isAuthenticated && isAdminPanelRole(role))) {
+  if (authLoading || isAdminAuthenticated) {
     return (
       <AdminAuthWrapper>
         <p className="text-center text-muted">{t('adminAuth:redirecting')}</p>
@@ -48,22 +42,11 @@ const AdminLogin = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(email, password);
+    const result = await loginAdmin(email, password);
     setLoading(false);
 
     if (result.success) {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        const role = typeof user.role === 'string' ? user.role : (user.role?.name || 'customer');
-        if (isAdminPanelRole(role)) {
-          navigate('/admin');
-          return;
-        }
-        navigate('/customer');
-      } else {
-        navigate('/admin');
-      }
+      navigate('/admin');
     } else {
       setError(result.message || t('adminAuth:login.loginFailed'));
     }
