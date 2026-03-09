@@ -1,0 +1,80 @@
+/**
+ * Admin dark mode – .dark-style on html
+ */
+
+html.dark-style {
+  color-scheme: dark;
+}
+html.dark-style body,
+html.dark-style .layout-wrapper,
+html.dark-style .layout-page,
+html.dark-style .content-wrapper {
+  background-color: #232333 !important;
+  color: #a1acb8;
+}
+html.dark-style .layout-menu,
+html.dark-style .bg-menu-theme,
+html.dark-style .menu-vertical {
+  background-color: #2f3349 !important;
+}
+html.dark-style .menu .menu-link,
+html.dark-style .menu .menu-text {
+  color: #a1acb8;
+}
+html.dark-style .menu .menu-link:hover,
+html.dark-style .menu .menu-item.active > .menu-link {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+html.dark-style .navbar,
+html.dark-style .layout-navbar {
+  background-color: #2f3349 !important;
+  color: #a1acb8;
+}
+html.dark-style .card {
+  background-color: #2f3349;
+  border-color: #434667;
+  color: #a1acb8;
+}
+html.dark-style .card-header,
+html.dark-style .card-title {
+  color: #e7e7ff;
+}
+html.dark-style .form-control,
+html.dark-style .form-select {
+  background-color: #232333;
+  border-color: #434667;
+  color: #fff;
+}
+html.dark-style .form-label,
+html.dark-style .form-check-label,
+html.dark-style .table {
+  color: #a1acb8;
+}
+html.dark-style .table thead th {
+  border-color: #434667;
+  color: #e7e7ff;
+}
+html.dark-style .table td,
+html.dark-style .table th {
+  border-color: #434667;
+}
+html.dark-style .layout-menu .app-brand-text {
+  color: #fff;
+}
+
+html.dark-style .content-footer,
+html.dark-style .footer,
+html.dark-style .bg-footer-theme {
+  background-color: #2f3349 !important;
+  border-color: #434667;
+  color: #a1acb8;
+}
+html.dark-style .content-footer .footer-link,
+html.dark-style .footer .footer-link {
+  color: #a1acb8;
+}
+html.dark-style .content-footer .footer-link:hover,
+html.dark-style .footer .footer-link:hover {
+  color: #fff;
+}

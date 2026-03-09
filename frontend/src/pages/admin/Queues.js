@@ -6,24 +6,35 @@ import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
 import AdminListToolbar from '../../components/admin/AdminListToolbar';
+import AdminFilterBar from '../../components/admin/AdminFilterBar';
 import { downloadExportCsv } from '../../utils/exportCsv';
 
 const API_URL = config.API_URL;
+
+const QUEUE_STATUS_OPTIONS = [
+  { value: '', labelKey: 'common:all' },
+  { value: 'waiting', label: 'Waiting' },
+  { value: 'current', label: 'Current' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
 
 const Queues = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ name: '', status: '' });
+  const [appliedFilters, setAppliedFilters] = useState({ name: '', status: '' });
 
   const queryParams = new URLSearchParams({
     page: String(page),
     limit: String(limit),
-    ...(search && { search: search.trim() }),
+    ...(appliedFilters.name && { search: appliedFilters.name.trim() }),
+    ...(appliedFilters.status && { status: appliedFilters.status }),
   });
 
   const { data, isLoading } = useQuery(
-    ['adminQueues', page, limit, search],
+    ['adminQueues', page, limit, appliedFilters],
     async () => {
       const res = await axios.get(`${API_URL}/admin/queues?${queryParams}`);
       return res.data;
@@ -36,7 +47,8 @@ const Queues = () => {
   const handleExport = () => {
     const exportParams = new URLSearchParams({
       export: 'csv',
-      ...(search && { search: search.trim() }),
+      ...(appliedFilters.name && { search: appliedFilters.name.trim() }),
+      ...(appliedFilters.status && { status: appliedFilters.status }),
     });
     downloadExportCsv(`${API_URL}/admin/queues?${exportParams}`, 'queues.csv');
   };
@@ -55,12 +67,18 @@ const Queues = () => {
     <div>
       <AdminListToolbar
         title={t('adminQueues:title')}
-        search={search}
-        onSearchChange={(e) => { setSearch(e.target.value); setPage(1); }}
-        searchPlaceholder={t('adminQueues:searchPlaceholder')}
-        onExport={handleExport}
         pagination={pagination}
         onPageChange={setPage}
+      />
+      <AdminFilterBar
+        filters={filters}
+        onFilterChange={setFilters}
+        onApply={() => { setAppliedFilters(filters); setPage(1); }}
+        onReset={() => { setFilters({ name: '', status: '' }); setAppliedFilters({ name: '', status: '' }); setPage(1); }}
+        onExport={handleExport}
+        namePlaceholder={t('adminQueues:searchPlaceholder')}
+        showStatus
+        statusOptions={QUEUE_STATUS_OPTIONS}
       />
 
       <Card>

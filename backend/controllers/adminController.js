@@ -116,9 +116,10 @@ exports.updateUser = async (req, res) => {
 // @access  Private (Admin)
 exports.getProviders = async (req, res) => {
   try {
-    const { search, export: exportFormat } = req.query;
+    const { search, isActive, export: exportFormat } = req.query;
     const query = {};
 
+    if (isActive !== undefined) query.isActive = isActive === 'true';
     if (search && search.trim()) {
       const re = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       query.$or = [

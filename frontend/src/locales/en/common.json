@@ -9,5 +9,10 @@
   "active": "Active",
   "inactive": "Inactive",
   "status": "Status",
-  "system": "System"
+  "system": "System",
+  "filter": "Filter",
+  "name": "Name",
+  "apply": "Apply",
+  "reset": "Reset",
+  "all": "All"
 }

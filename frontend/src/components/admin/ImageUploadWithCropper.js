@@ -114,23 +114,28 @@ export default function ImageUploadWithCropper({
   const handleCropperImageLoad = () => {
     if (!cropperOpen || !cropperSrc || !cropperImgRef.current || !hasAspectRatio) return;
     if (cropperInstanceRef.current) return;
+    const ratio = widthRatio / heightRatio;
     const cropper = new Cropper(cropperImgRef.current, {
-      aspectRatio: widthRatio / heightRatio,
-      viewMode: 0.4,
+      aspectRatio: ratio,
+      viewMode: 0,
       autoCropArea: 1,
       zoomable: true,
       scalable: false,
       responsive: true,
       cropBoxResizable: true,
       cropBoxMovable: true,
+      guides: true,
+      center: true,
+      highlight: true,
     });
     cropperInstanceRef.current = cropper;
   };
 
   const handleCropDone = () => {
     const cropper = cropperInstanceRef.current;
-    if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas();
+    if (!cropper || typeof cropper.getCroppedCanvas !== 'function') return;
+    const canvas = cropper.getCroppedCanvas({ imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
+    if (!canvas) return;
     canvas.toBlob(
       (blob) => {
         if (blob) {
@@ -187,14 +192,14 @@ export default function ImageUploadWithCropper({
         </span>
       </div>
       {cropperOpen && cropperSrc && (
-        <div className="cropper-model show" style={{ display: 'block' }}>
+        <div key={name} className="cropper-model show" style={{ display: 'block' }}>
           <div className="cropper-popup">
-            <div className="cropper-inner">
+            <div className="cropper-inner" style={{ height: 400, backgroundColor: '#000' }}>
               <img
                 ref={cropperImgRef}
                 src={cropperSrc}
                 alt="Crop"
-                style={{ maxWidth: '100%', display: 'block' }}
+                style={{ maxWidth: '100%', maxHeight: 400, display: 'block' }}
                 onLoad={handleCropperImageLoad}
               />
             </div>

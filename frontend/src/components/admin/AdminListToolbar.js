@@ -3,34 +3,36 @@ import { Form, InputGroup, Button, Pagination } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Reusable toolbar for admin list pages (Alembic-style): search, export, pagination.
+ * Reusable toolbar for admin list pages: title and pagination.
+ * Filter/Export are in AdminFilterBar (Alembic-style) below the title.
  * @param {string} title - Page title
- * @param {string} search - Search value
- * @param {function} onSearchChange - (e) => setSearch(e.target.value)
- * @param {string} searchPlaceholder - Placeholder for search input
- * @param {function} onExport - () => trigger export (open URL or fetch with export=csv)
  * @param {object} pagination - { page, limit, total, totalPages }
  * @param {function} onPageChange - (page) => setPage(page)
- * @param {React.ReactNode} extra - Optional extra buttons (e.g. Create Role)
+ * @param {string} [search] - Optional legacy search value
+ * @param {function} [onSearchChange] - Optional legacy
+ * @param {string} [searchPlaceholder] - Optional; when set shows search input (legacy)
+ * @param {function} [onExport] - Optional legacy export in toolbar
+ * @param {React.ReactNode} [extra] - Optional extra buttons (e.g. Create Role)
  */
 const AdminListToolbar = ({
   title,
-  search,
-  onSearchChange,
-  searchPlaceholder,
-  onExport,
   pagination,
   onPageChange,
+  search = '',
+  onSearchChange,
+  searchPlaceholder = null,
+  onExport,
   extra = null,
 }) => {
   const { t } = useTranslation();
   const { page, totalPages } = pagination || {};
+  const showLegacySearch = searchPlaceholder != null && onSearchChange != null;
 
   return (
     <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
       <h4 className="fw-bold mb-0">{title}</h4>
       <div className="d-flex flex-wrap align-items-center gap-2">
-        {searchPlaceholder != null && (
+        {showLegacySearch && (
           <InputGroup style={{ width: '260px' }}>
             <InputGroup.Text>
               <i className="bx bx-search"></i>

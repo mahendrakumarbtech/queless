@@ -1,5 +1,5 @@
 /**
- * Returns greeting message in Sneat style: "Hello {name}, Good Evening 🌙"
+ * Returns greeting message: "Hello {name}, Good Evening 🌙"
  */
 const getGreetingMessage = (name = 'Admin') => {
   const hour = new Date().getHours();

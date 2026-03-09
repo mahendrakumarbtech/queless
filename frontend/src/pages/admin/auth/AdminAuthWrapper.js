@@ -12,7 +12,7 @@ const AuthPageLoader = () => (
 
 /**
  * Wrapper for admin auth pages (login, forgot password).
- * Loads Sneat theme so design matches dashboard; constrains logo size.
+ * Loads admin theme so design matches dashboard; constrains logo size.
  */
 export const AdminAuthWrapper = ({ children }) => {
   const { websiteName, headerLogoUrl } = usePublicSettings();

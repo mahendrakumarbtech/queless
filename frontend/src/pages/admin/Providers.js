@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import config from '../../config/config';
 import AdminListToolbar from '../../components/admin/AdminListToolbar';
+import AdminFilterBar from '../../components/admin/AdminFilterBar';
 import { downloadExportCsv } from '../../utils/exportCsv';
 
 const API_URL = config.API_URL;
@@ -13,16 +14,18 @@ const Providers = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ name: '', status: '' });
+  const [appliedFilters, setAppliedFilters] = useState({ name: '', status: '' });
 
   const queryParams = new URLSearchParams({
     page: String(page),
     limit: String(limit),
-    ...(search && { search: search.trim() }),
+    ...(appliedFilters.name && { search: appliedFilters.name.trim() }),
+    ...(appliedFilters.status !== '' && { isActive: appliedFilters.status }),
   });
 
   const { data, isLoading } = useQuery(
-    ['adminProviders', page, limit, search],
+    ['adminProviders', page, limit, appliedFilters],
     async () => {
       const res = await axios.get(`${API_URL}/admin/providers?${queryParams}`);
       return res.data;
@@ -35,7 +38,8 @@ const Providers = () => {
   const handleExport = () => {
     const exportParams = new URLSearchParams({
       export: 'csv',
-      ...(search && { search: search.trim() }),
+      ...(appliedFilters.name && { search: appliedFilters.name.trim() }),
+      ...(appliedFilters.status !== '' && { isActive: appliedFilters.status }),
     });
     downloadExportCsv(`${API_URL}/admin/providers?${exportParams}`, 'providers.csv');
   };
@@ -44,12 +48,17 @@ const Providers = () => {
     <div>
       <AdminListToolbar
         title={t('adminProviders:title')}
-        search={search}
-        onSearchChange={(e) => { setSearch(e.target.value); setPage(1); }}
-        searchPlaceholder={t('adminProviders:searchPlaceholder')}
-        onExport={handleExport}
         pagination={pagination}
         onPageChange={setPage}
+      />
+      <AdminFilterBar
+        filters={filters}
+        onFilterChange={setFilters}
+        onApply={() => { setAppliedFilters(filters); setPage(1); }}
+        onReset={() => { setFilters({ name: '', status: '' }); setAppliedFilters({ name: '', status: '' }); setPage(1); }}
+        onExport={handleExport}
+        namePlaceholder={t('adminProviders:searchPlaceholder')}
+        showStatus
       />
 
       {isLoading ? (

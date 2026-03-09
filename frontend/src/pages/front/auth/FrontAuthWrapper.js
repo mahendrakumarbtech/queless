@@ -8,19 +8,28 @@ import { usePublicSettings } from '../../../context/PublicSettingsContext';
  * Keeps layout consistent with the main site; no admin theme or links.
  */
 export const FrontAuthWrapper = ({ children }) => {
-  const { websiteName } = usePublicSettings();
+  const { websiteName, websiteLogo } = usePublicSettings();
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50', py: 4 }}>
       <Container maxWidth="sm">
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography
-            component={Link}
-            to="/"
-            variant="h5"
-            fontWeight="bold"
-            sx={{ color: 'primary.main', textDecoration: 'none' }}
-          >
+        <Box
+          component={Link}
+          to="/"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1.5,
+            mb: 3,
+            textDecoration: 'none',
+            color: 'primary.main',
+          }}
+        >
+          {websiteLogo ? (
+            <img src={websiteLogo} alt={websiteName} style={{ maxHeight: 40, objectFit: 'contain' }} />
+          ) : null}
+          <Typography variant="h5" fontWeight="bold">
             {websiteName}
           </Typography>
         </Box>

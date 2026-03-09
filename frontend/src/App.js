@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { ToastContainer } from 'react-toastify';
+import './styles/global';
 
 import { AuthProvider } from './context/AuthContext';
 import { PublicSettingsProvider, usePublicSettings } from './context/PublicSettingsContext';
 import PrivateRoute from './components/front/PrivateRoute';
 import Navbar from './components/front/Navbar';
-import SneatLayout from './components/admin/SneatLayout';
+import AdminLayout from './components/admin/AdminLayout';
 import Home from './pages/front/Home';
 import Login from './pages/front/auth/Login';
 import Register from './pages/front/auth/Register';
@@ -115,6 +117,7 @@ const ThemeWrapper = ({ children }) => {
     <ThemeProvider theme={currentTheme}>
       <CssBaseline />
       {children}
+      <ToastContainer position="top-right" autoClose={4000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="light" />
     </ThemeProvider>
   );
 };
@@ -162,7 +165,7 @@ function App() {
                 path="/admin/*"
                 element={
                   <PrivateRoute allowedRoles={['admin', 'staff']} redirectToAdminLogin>
-                    <SneatLayout>
+                    <AdminLayout>
                       <Routes>
                         <Route index element={<AdminDashboard />} />
                         <Route path="roles" element={<Roles />} />
@@ -175,7 +178,7 @@ function App() {
                         <Route path="settings" element={<AdminSettings />} />
                         <Route path="*" element={<Navigate to="/admin" replace />} />
                       </Routes>
-                    </SneatLayout>
+                    </AdminLayout>
                   </PrivateRoute>
                 }
               />

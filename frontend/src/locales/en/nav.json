@@ -1,4 +1,8 @@
 {
+  "home": "Home",
+  "features": "Features",
+  "about": "About",
+  "contact": "Contact",
   "providers": "Providers",
   "dashboard": "Dashboard",
   "login": "Login",

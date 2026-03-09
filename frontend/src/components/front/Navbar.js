@@ -9,7 +9,7 @@ import { usePublicSettings } from '../../context/PublicSettingsContext';
 const Navbar = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const { websiteName } = usePublicSettings();
+  const { websiteName, websiteLogo } = usePublicSettings();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -39,13 +39,43 @@ const Navbar = () => {
 
   const dashboardLink = getDashboardLink();
 
+  const navLinks = [
+    { label: t('nav:home'), to: '/' },
+    { label: t('nav:features'), to: '/#features' },
+    { label: t('nav:about'), to: '/#about' },
+    { label: t('nav:contact'), to: '/#contact' },
+  ];
+
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
-          {websiteName}
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+    <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'white', color: 'grey.900', borderBottom: '1px solid', borderColor: 'grey.200' }}>
+      <Toolbar sx={{ gap: 1 }}>
+        <Box
+          component={Link}
+          to="/"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            textDecoration: 'none',
+            color: 'inherit',
+            flexGrow: 1,
+          }}
+        >
+          {websiteLogo ? (
+            <img src={websiteLogo} alt={websiteName} style={{ maxHeight: 36, objectFit: 'contain' }} />
+          ) : null}
+          <Typography variant="h6" fontWeight="700" component="span">
+            {websiteName}
+          </Typography>
+        </Box>
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, alignItems: 'center' }}>
+          {navLinks.map(({ label, to }) => (
+            <Button key={to} color="inherit" component={Link} to={to} sx={{ color: 'grey.700', fontWeight: 500 }}>
+              {label}
+            </Button>
+          ))}
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {isFrontUser ? (
             <>
               {dashboardLink && (
@@ -88,10 +118,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Button color="inherit" component={Link} to="/login">
+              <Button component={Link} to="/login" sx={{ color: 'grey.700', fontWeight: 600 }}>
                 {t('nav:login')}
               </Button>
-              <Button color="inherit" component={Link} to="/register">
+              <Button component={Link} to="/register" variant="contained" color="primary" sx={{ fontWeight: 600 }}>
                 {t('nav:register')}
               </Button>
             </>

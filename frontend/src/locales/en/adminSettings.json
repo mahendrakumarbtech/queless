@@ -2,7 +2,10 @@
   "title": "Settings",
   "messages": {
     "saved": "Settings saved successfully",
-    "saveFailed": "Failed to save"
+    "saveFailed": "Failed to save",
+    "successTitle": "Success",
+    "errorTitle": "Error",
+    "warningTitle": "Warning"
   },
   "buttons": {
     "saving": "Saving...",

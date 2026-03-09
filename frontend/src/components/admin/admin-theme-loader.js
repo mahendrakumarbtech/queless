@@ -1,17 +1,17 @@
 /**
- * Loads Sneat theme assets when admin layout mounts; removes on unmount.
+ * Loads admin theme assets when admin layout mounts; removes on unmount.
  * Theme CSS is injected only on admin so it doesn't break the main app layout.
  * We wait for CSS to load before showing layout (avoids FOUC).
  */
-const THEME_LINK_ID = 'sneat-admin-theme';
+const THEME_LINK_ID = 'admin-theme';
 
 const themeStyles = [
-  { href: 'https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap', id: 'sneat-fonts' },
-  { href: '/assets/vendor/fonts/boxicons.css', id: 'sneat-boxicons' },
-  { href: '/assets/vendor/css/core.css', id: 'sneat-core' },
-  { href: '/assets/vendor/css/theme-default.css', id: 'sneat-theme-default' },
-  { href: '/assets/css/demo.css', id: 'sneat-demo' },
-  { href: '/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css', id: 'sneat-perfect-scrollbar' },
+  { href: 'https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap', id: 'admin-fonts' },
+  { href: '/assets/vendor/fonts/boxicons.css', id: 'admin-boxicons' },
+  { href: '/assets/vendor/css/core.css', id: 'admin-core' },
+  { href: '/assets/vendor/css/theme-default.css', id: 'admin-theme-default' },
+  { href: '/assets/css/demo.css', id: 'admin-demo' },
+  { href: '/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css', id: 'admin-perfect-scrollbar' },
 ];
 
 const htmlClasses = ['light-style', 'layout-menu-fixed', 'layout-content-navbar', 'layout-compact'];
@@ -22,7 +22,7 @@ function loadStyle(href, id) {
     link.rel = 'stylesheet';
     link.href = href;
     link.id = id;
-    link.setAttribute('data-sneat-admin', THEME_LINK_ID);
+    link.setAttribute('data-admin-theme', THEME_LINK_ID);
     link.onload = () => resolve();
     link.onerror = () => resolve();
     document.head.appendChild(link);
@@ -40,7 +40,7 @@ export function loadAdminTheme() {
     link.rel = 'stylesheet';
     link.href = href;
     link.id = id;
-    link.setAttribute('data-sneat-admin', THEME_LINK_ID);
+    link.setAttribute('data-admin-theme', THEME_LINK_ID);
     document.head.appendChild(link);
   });
 }
@@ -59,7 +59,7 @@ export function loadAdminThemeAsync() {
 }
 
 export function unloadAdminTheme() {
-  document.querySelectorAll(`link[data-sneat-admin="${THEME_LINK_ID}"]`).forEach((el) => el.remove());
+  document.querySelectorAll(`link[data-admin-theme="${THEME_LINK_ID}"]`).forEach((el) => el.remove());
   const html = document.documentElement;
   htmlClasses.forEach((c) => html.classList.remove(c));
   html.removeAttribute('dir');

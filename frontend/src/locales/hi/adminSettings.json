@@ -2,7 +2,10 @@
   "title": "सेटिंग्स",
   "messages": {
     "saved": "सेटिंग्स सफलतापूर्वक सहेजी गईं",
-    "saveFailed": "सहेजने में विफल"
+    "saveFailed": "सहेजने में विफल",
+    "successTitle": "सफल",
+    "errorTitle": "त्रुटि",
+    "warningTitle": "चेतावनी"
   },
   "buttons": {
     "saving": "सहेजा जा रहा है...",

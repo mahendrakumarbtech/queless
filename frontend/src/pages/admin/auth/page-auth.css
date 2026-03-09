@@ -1,7 +1,7 @@
-/* Admin auth pages - from theme react-sneat-bootstrap-admin-template */
+/* Admin auth pages */
 @charset "UTF-8";
 
-/* Theme loading state (before Sneat CSS is applied) */
+/* Theme loading state (before admin CSS is applied) */
 .auth-page-theme-loader {
   position: fixed;
   inset: 0;

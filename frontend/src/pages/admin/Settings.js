@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import notify from '../../utils/notify';
 import config from '../../config/config';
 import { usePublicSettings } from '../../context/PublicSettingsContext';
 import ImageUploadWithCropper from '../../components/admin/ImageUploadWithCropper';
@@ -71,9 +72,17 @@ const Settings = () => {
     try {
       await axios.put(`${API_URL}/admin/settings`, payload);
       await refetchPublicSettings();
-      alert(t('adminSettings:messages.saved'));
+      await notify.success({
+        title: t('adminSettings:messages.successTitle'),
+        text: t('adminSettings:messages.saved'),
+        // useSwal: true,
+      });
     } catch (err) {
-      alert(err.response?.data?.message || t('adminSettings:messages.saveFailed'));
+      await notify.error({
+        title: t('adminSettings:messages.errorTitle'),
+        text: err.response?.data?.message || t('adminSettings:messages.saveFailed'),
+        useSwal: true,
+      });
     } finally {
       setSaving(false);
     }

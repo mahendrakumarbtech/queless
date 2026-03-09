@@ -1,258 +1,380 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import {
-  Box,
-  Drawer,
-  AppBar,
-  Toolbar,
-  List,
-  Typography,
-  Divider,
-  IconButton,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  useTheme,
-  useMediaQuery,
-  Avatar,
-  Menu,
-  MenuItem,
-  Badge,
-} from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Dashboard as DashboardIcon,
-  People as PeopleIcon,
-  Business as BusinessIcon,
-  Settings as SettingsIcon,
-  Logout as LogoutIcon,
-  Notifications as NotificationsIcon,
-  AccountCircle as AccountCircleIcon,
-  Queue as QueueIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
+import { usePublicSettings } from '../../context/PublicSettingsContext';
+import LanguageSwitcher from '../front/LanguageSwitcher';
+import { loadAdminThemeAsync, unloadAdminTheme } from './admin-theme-loader';
+import './AdminLayout.css';
+import './admin-dark.css';
 
-const drawerWidth = 280;
-
-const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
-  { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
-  { text: 'Providers', icon: <BusinessIcon />, path: '/admin/providers' },
-  { text: 'Queues', icon: <QueueIcon />, path: '/admin/queues' },
-  { text: 'Settings', icon: <SettingsIcon />, path: '/admin/settings' },
+const getMenuItems = (t) => [
+  { text: t('menu:dashboard'), icon: 'bx bx-home', path: '/admin' },
+  {
+    text: t('menu:rolePermission'),
+    icon: 'bx bx-lock-alt',
+    path: '/admin/roles',
+  },
+  {
+    text: t('menu:users'),
+    icon: 'bx bx-user',
+    path: '/admin/users',
+    children: [
+      { text: t('menu:staff'), path: '/admin/users/staff' },
+      { text: t('menu:provider'), path: '/admin/users/provider' },
+      { text: t('menu:customer'), path: '/admin/users/customer' },
+    ],
+  },
+  { text: t('menu:settings'), icon: 'bx bx-cog', path: '/admin/settings' },
 ];
 
-const AdminLayout = ({ children }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, logout } = useAuth();
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-    handleMenuClose();
-  };
-
-  const drawer = (
-    <Box>
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-        }}
-      >
-        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)' }}>
-          <DashboardIcon />
-        </Avatar>
-        <Box>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Admin Panel
-          </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.9 }}>
-            Queue Management
-          </Typography>
-        </Box>
-      </Box>
-      <Divider />
-      <List sx={{ pt: 2 }}>
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <ListItem key={item.text} disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  navigate(item.path);
-                  if (isMobile) setMobileOpen(false);
-                }}
-                sx={{
-                  mx: 1,
-                  mb: 0.5,
-                  borderRadius: 2,
-                  bgcolor: isActive ? 'primary.main' : 'transparent',
-                  color: isActive ? 'white' : 'text.primary',
-                  '&:hover': {
-                    bgcolor: isActive ? 'primary.dark' : 'action.hover',
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    color: isActive ? 'white' : 'inherit',
-                    minWidth: 40,
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  primaryTypographyProps={{
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-    </Box>
+const AdminLayoutLoader = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="admin-theme-loader-wrap">
+      <div className="admin-theme-loader-spinner" aria-hidden="true" />
+      <p className="admin-theme-loader-text">{t('common:loading')}</p>
+    </div>
   );
+};
+
+const AdminLayout = ({ children }) => {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const pathname = location.pathname;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [expandedMenuPath, setExpandedMenuPath] = useState(null);
+  const [themeReady, setThemeReady] = useState(false);
+  const [themeMode, setThemeMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('admin-theme-mode');
+      if (stored === 'dark' || stored === 'light' || stored === 'system') return stored;
+      return 'system';
+    }
+    return 'system';
+  });
+  const [systemDark, setSystemDark] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
+  );
+  const navigate = useNavigate();
+  const isDark = themeMode === 'dark' || (themeMode === 'system' && systemDark);
+  const { adminUser, logoutAdmin } = useAuth();
+  const { websiteName, sidebarLogoUrl } = usePublicSettings();
+  const menuItems = getMenuItems(t);
+
+  const isMenuOpen = (item) => {
+    if (!item.children) return false;
+    return expandedMenuPath === item.path || (expandedMenuPath === null && pathname.startsWith(item.path));
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    loadAdminThemeAsync().then(() => {
+      if (!cancelled) setThemeReady(true);
+    });
+    return () => {
+      cancelled = true;
+      unloadAdminTheme();
+    };
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const apply = () => {
+      const effective = themeMode === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : themeMode;
+      root.setAttribute('data-bs-theme', effective);
+      if (effective === 'dark') {
+        root.classList.remove('light-style');
+        root.classList.add('dark-style');
+      } else {
+        root.classList.remove('dark-style');
+        root.classList.add('light-style');
+      }
+    };
+    apply();
+    if (typeof localStorage !== 'undefined') localStorage.setItem('admin-theme-mode', themeMode);
+    if (themeMode === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const onChange = () => {
+        apply();
+        setSystemDark(mq.matches);
+      };
+      setSystemDark(mq.matches);
+      mq.addEventListener('change', onChange);
+      return () => mq.removeEventListener('change', onChange);
+    }
+  }, [themeMode]);
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logoutAdmin();
+    navigate('/admin/login');
+  };
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  if (!themeReady) {
+    return <AdminLayoutLoader />;
+  }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f7fa' }}>
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
-          bgcolor: 'white',
-          color: 'text.primary',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            {menuItems.find((item) => item.path === location.pathname)?.text || 'Dashboard'}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton onClick={handleMenuOpen} sx={{ ml: 1 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                {user?.name?.charAt(0).toUpperCase() || 'A'}
-              </Avatar>
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+    <div className="layout-wrapper layout-content-navbar">
+      <div className={`layout-container ${sidebarOpen ? 'layout-menu-expanded' : ''}`}>
+        <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme">
+          <div className="app-brand demo">
+            <Link to="/admin" className="app-brand-link" aria-label={`${websiteName} home`}>
+              {sidebarLogoUrl ? (
+                <span className="app-brand-logo demo">
+                  <img src={sidebarLogoUrl} alt={websiteName} aria-label={`${websiteName} logo`} />
+                </span>
+              ) : (
+                <span className="app-brand-text demo menu-text fw-bold">{websiteName}</span>
+              )}
+            </Link>
+            <button
+              type="button"
+              className="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label={t('aria:toggleMenu')}
             >
-              <MenuItem onClick={handleMenuClose}>
-                <ListItemIcon>
-                  <AccountCircleIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary={user?.name || 'Admin'} secondary={user?.email} />
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={handleLogout}>
-                <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Logout" />
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <Box
-        component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-        aria-label="navigation"
-      >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              borderRight: '1px solid rgba(0,0,0,0.08)',
-            },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          mt: 8,
-        }}
-      >
-        {children || <Outlet />}
-      </Box>
-    </Box>
+              <i className="bx bx-chevron-left bx-sm align-middle"></i>
+            </button>
+          </div>
+
+          <div className="menu-inner-shadow"></div>
+
+          <ul className="menu-inner py-1">
+            {menuItems.map((item) => (
+              <li key={item.path || item.text} className={`menu-item ${item.children ? 'menu-item-sub' : ''} ${isMenuOpen(item) ? 'open' : ''}`}>
+                {item.children ? (
+                  <>
+                    <a
+                      href={`#menu-${(item.path || item.text).replace(/\//g, '-')}`}
+                      className="menu-link menu-toggle"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExpandedMenuPath((prev) => (prev === item.path ? null : item.path));
+                      }}
+                      aria-expanded={isMenuOpen(item)}
+                      role="button"
+                    >
+                      <i className={`menu-icon tf-icons ${item.icon}`}></i>
+                      <div>{item.text}</div>
+                    </a>
+                    <ul className="menu-sub">
+                      {item.children.map((sub) => (
+                        <li key={sub.path} className="menu-item">
+                          <NavLink to={sub.path} className="menu-link" onClick={closeSidebar}>
+                            <div>{sub.text}</div>
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className="menu-link"
+                    onClick={closeSidebar}
+                    aria-label={item.text}
+                  >
+                    <i className={`menu-icon tf-icons ${item.icon}`}></i>
+                    <div>{item.text}</div>
+                  </NavLink>
+                )}
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div className="layout-page">
+          <nav
+            className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+            id="layout-navbar"
+          >
+            <div className="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+              <button
+                type="button"
+                className="nav-item nav-link px-0 me-xl-4"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={t('aria:toggleSidebar')}
+              >
+                <i className="bx bx-menu bx-sm"></i>
+              </button>
+            </div>
+
+            <div className="navbar-nav-right d-flex align-items-center w-100" id="navbar-collapse">
+              <ul className="navbar-nav flex-row align-items-center ms-auto">
+                <li className="nav-item dropdown dropdown-notifications">
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle hide-arrow position-relative"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label={t('nav:notifications')}
+                  >
+                    <i className="bx bx-bell bx-sm"></i>
+                    <span className="badge rounded-pill bg-danger badge-dot position-absolute border border-white top-0 end-0 mt-1 me-1"></span>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end py-0">
+                    <li className="dropdown-menu-header border-bottom d-flex align-items-center justify-content-between px-3 py-2">
+                      <span className="fw-semibold">{t('nav:notification')}</span>
+                      <span className="badge rounded-pill bg-label-primary">0</span>
+                    </li>
+                    <li className="dropdown-notifications-list scrollable-container">
+                      <ul className="list-group list-group-flush">
+                        <li className="list-group-item list-group-item-action dropdown-notifications-item py-3">
+                          <small className="text-muted">{t('nav:noNotifications')}</small>
+                        </li>
+                      </ul>
+                    </li>
+                    <li className="dropdown-menu-footer border-top">
+                      <button type="button" className="dropdown-item fw-medium py-2 text-center">
+                        {t('nav:viewAllNotifications')}
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+                <li className="nav-item dropdown">
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle hide-arrow"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label={t('nav:themeMode')}
+                    title={t('nav:themeMode')}
+                  >
+                    <i className={`bx bx-sm ${isDark ? 'bx-moon' : 'bx-sun'}`}></i>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end dropdown-menu-theme">
+                    <li>
+                      <button
+                        type="button"
+                        className={`dropdown-item ${themeMode === 'light' ? 'active' : ''}`}
+                        onClick={() => setThemeMode('light')}
+                      >
+                        <i className="bx bx-sun me-2"></i>
+                        <span>{t('nav:light')}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`dropdown-item ${themeMode === 'dark' ? 'active' : ''}`}
+                        onClick={() => setThemeMode('dark')}
+                      >
+                        <i className="bx bx-moon me-2"></i>
+                        <span>{t('nav:dark')}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`dropdown-item ${themeMode === 'system' ? 'active' : ''}`}
+                        onClick={() => setThemeMode('system')}
+                      >
+                        <i className="bx bx-desktop me-2"></i>
+                        <span>{t('nav:system')}</span>
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+                <LanguageSwitcher />
+                <li className="nav-item navbar-dropdown dropdown-user dropdown">
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle hide-arrow"
+                    data-bs-toggle="dropdown"
+                    aria-label={t('aria:profileMenu')}
+                  >
+                    <div className="avatar avatar-online">
+                      <span className="avatar-initial rounded-circle bg-label-primary">
+                        {adminUser?.name?.charAt(0).toUpperCase() || 'A'}
+                      </span>
+                    </div>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button type="button" className="dropdown-item">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar avatar-online">
+                              <span className="avatar-initial rounded-circle bg-label-primary">
+                                {adminUser?.name?.charAt(0).toUpperCase() || 'A'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <span className="fw-medium d-block">{adminUser?.name || 'Admin'}</span>
+                            <small className="text-muted">{t('common:admin')}</small>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                    <li><div className="dropdown-divider"></div></li>
+                    <li>
+                      <button type="button" className="dropdown-item">
+                        <i className="bx bx-user me-2"></i>
+                        <span className="align-middle">{t('menu:myProfile')}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" className="dropdown-item">
+                        <i className="bx bx-cog me-2"></i>
+                        <span className="align-middle">{t('menu:settings')}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" className="dropdown-item">
+                        <span className="d-flex align-items-center align-middle">
+                          <i className="bx bx-credit-card me-2 flex-shrink-0"></i>
+                          <span className="flex-grow-1 align-middle ms-1">{t('menu:billing')}</span>
+                          <span className="badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                        </span>
+                      </button>
+                    </li>
+                    <li><div className="dropdown-divider"></div></li>
+                    <li>
+                      <button type="button" className="dropdown-item" onClick={handleLogout}>
+                        <i className="bx bx-power-off me-2"></i>
+                        <span className="align-middle">{t('menu:logOut')}</span>
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </nav>
+
+          <div className="content-wrapper">
+            <div className="container-xxl flex-grow-1 container-p-y">
+              {children || <Outlet />}
+            </div>
+
+            <footer className="content-footer footer bg-footer-theme">
+              <div className="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                <div className="mb-2 mb-md-0">
+                  © {new Date().getFullYear()}, made with <span className="text-danger">❤️</span> by{' '}
+                  <Link to="/admin" className="footer-link fw-medium">{websiteName}</Link>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+
+        <div
+          className="layout-overlay layout-menu-toggle"
+          onClick={closeSidebar}
+          onKeyDown={(e) => e.key === 'Enter' && closeSidebar()}
+          role="button"
+          tabIndex={0}
+          aria-label={t('aria:closeMenu')}
+        />
+      </div>
+    </div>
   );
 };
 
